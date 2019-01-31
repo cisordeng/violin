@@ -11,6 +11,7 @@
 
   import {mapState} from 'vuex';
   import cTitle from 'components/title';
+  import Vue from 'vue';
 
   export default {
     data () {
@@ -24,6 +25,13 @@
         const response = await fetch('/api/hello');
         this.content = await response.text();
         document.title = this.title;
+
+        // Vue.http.get("http://localhost:8080/user/user?username=cisor")
+        //     .then((data) => {
+        //         console.log(data)
+        // })
+
+
       }
     },
     mounted () {

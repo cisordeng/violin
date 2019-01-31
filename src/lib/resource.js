@@ -16,43 +16,53 @@ let Resource = {
             url = getUrl(options.resource, options.data, options.service)
             data = {}
         } else {
-        let _method = {}
-        if (options.data.hasOwnProperty('_method')) {
-            _method = {'_method':options.data['_method']}
-            delete options['_method']
-        }
-        url = getUrl(options.resource, _method, options.service)
-        data = options.data
-        header['content-type'] = 'application/x-www-form-urlencoded';
+            let _method = {}
+            if (options.data.hasOwnProperty('_method')) {
+                _method = {'_method':options.data['_method']}
+                delete options['_method']
+            }
+            url = getUrl(options.resource, _method, options.service)
+            data = options.data
+            header['content-type'] = 'application/x-www-form-urlencoded';
         }
 
         console.debug(`[resource] ${options.method} ${url}`);
         return new Promise((resolve, reject) => {
-        wx.request({
-            url: url,
-            method: options.method,
-            data: data,
-            header: header,
-            success: res => {
-        console.log('return from server')
-            if (res.statusCode === 200) {
-                let businessData = res.data.data;
-                if (res.data.code == 200) {
-                resolve(businessData, res.data);
+            wx.request({
+                url: url,
+                method: options.method,
+                data: data,
+                header: header,
+                success: res => {
+            console.log('return from server')
+                if (res.statusCode === 200) {
+                    let businessData = res.data.data;
+                    if (res.data.code == 200) {
+                    resolve(businessData, res.data);
+                    } else {
+                    res.isBusinessError = true
+                    reject(res)
+                    }
                 } else {
-                res.isBusinessError = true
-                reject(res)
+                    res.isBusinessError = false
+                    reject(res);
                 }
-            } else {
+                },
+                fail: res => {
                 res.isBusinessError = false
-                reject(res);
+                reject(res);  
+                }
+            })
+            switch(options.method) {
+                case 'GET':
+                break;
+                case 'PUT':
+                break;
+                case 'POST':
+                break;
+                case 'DELETE':
+                break;
             }
-            },
-            fail: res => {
-            res.isBusinessError = false
-            reject(res);  
-            }
-        })
         })
     },
 
@@ -62,8 +72,7 @@ let Resource = {
     },
 
     put (options) {
-        options.method = 'POST'
-        options.data['_method'] = 'put'
+        options.method = 'PUT'
         return this.query(options)
     },
 
@@ -73,8 +82,7 @@ let Resource = {
     },
 
     delete (options) {
-        options.method = 'POST'
-        options.data['_method'] = 'delete'
+        options.method = 'DELETE'
         return this.query(options)
     }
 }

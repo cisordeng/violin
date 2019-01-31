@@ -3,12 +3,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
+import VueResource from 'vue-resource'
 import App from './app'
 import routes from './routes'
 import storeOption from './vuex/store'
 
 Vue.use(Vuex);
 Vue.use(VueRouter);
+Vue.use(VueResource);
 
 // 创建一个路由对象用于管理页面的路由
 const router = new VueRouter({
