@@ -12,6 +12,7 @@
   import {mapState} from 'vuex';
   import cTitle from 'components/title';
   import Vue from 'vue';
+  import Resource from '../lib/resource';
 
   export default {
     data () {
@@ -23,14 +24,23 @@
     methods: {
       async getContent () {
         const response = await fetch('/api/hello');
+        console.log(response);
         this.content = await response.text();
         document.title = this.title;
 
-        // Vue.http.get("http://localhost:8080/user/user?username=cisor")
-        //     .then((data) => {
-        //         console.log(data)
-        // })
-
+        // Vue.http.get("http://localhost:8080/user/user?username=cisor").then(resp => {
+        //   console.log(resp);
+        // }, resp => {
+        //   console.log(resp);
+        // });
+        console.log(Resource);
+        Resource.get({
+          service: "mango",
+          resource: "user.user",
+          data: {
+            username: "cisor",
+          },
+        });
 
       }
     },

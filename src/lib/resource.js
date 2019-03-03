@@ -1,68 +1,34 @@
-let API_SERVER = 'http://localhost' // 开发环境
+import Vue from 'vue';
+
+let API_SERVER = 'http://devapi.cisor.cn' // 开发环境
 let Resource = {
     API_SERVER: API_SERVER,
 
     query (options) {
-        let isGET = options.method === 'GET'
-        
-        let header = {
-            'Accept': 'application/json',
-            'Authorization': ''
-        }
+        let service = options.service;
+        let resource = options.resource.replace(/\./g, '/');
+        let data = options.data;
 
-        let url = null;
-        let data = null;
-        if (isGET) {
-            url = getUrl(options.resource, options.data, options.service)
-            data = {}
-        } else {
-            let _method = {}
-            if (options.data.hasOwnProperty('_method')) {
-                _method = {'_method':options.data['_method']}
-                delete options['_method']
+        let url = `${API_SERVER}/${service}/${resource}/`;
+
+        if (options.method === "GET") {
+            url += "?";
+            for (let key in data) {
+                let value = data[key];
+                url += `${key}=${value}&`;
             }
-            url = getUrl(options.resource, _method, options.service)
-            data = options.data
-            header['content-type'] = 'application/x-www-form-urlencoded';
         }
 
-        console.debug(`[resource] ${options.method} ${url}`);
         return new Promise((resolve, reject) => {
-            wx.request({
-                url: url,
-                method: options.method,
-                data: data,
-                header: header,
-                success: res => {
-            console.log('return from server')
-                if (res.statusCode === 200) {
-                    let businessData = res.data.data;
-                    if (res.data.code == 200) {
-                    resolve(businessData, res.data);
-                    } else {
-                    res.isBusinessError = true
-                    reject(res)
-                    }
+            Vue.http[options.method.toLocaleLowerCase()](url, data).then(resp =>{
+                if (resp.data.code === 200) {
+                    resolve(resp.data);
                 } else {
-                    res.isBusinessError = false
-                    reject(res);
+                    reject(resp.data);
                 }
-                },
-                fail: res => {
-                res.isBusinessError = false
-                reject(res);  
-                }
-            })
-            switch(options.method) {
-                case 'GET':
-                break;
-                case 'PUT':
-                break;
-                case 'POST':
-                break;
-                case 'DELETE':
-                break;
-            }
+            }, resp => {
+                reject(resp.data);
+            });  
         })
     },
 
@@ -86,3 +52,5 @@ let Resource = {
         return this.query(options)
     }
 }
+
+export default Resource;
