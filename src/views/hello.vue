@@ -41,6 +41,8 @@
             username: "cisor",
           },
         });
+        let wsuri = "ws://devapi.cisor.cn/mango/ws/ws/"
+        new WebSocket(wsuri); 
 
       }
     },
