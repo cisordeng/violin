@@ -10,13 +10,13 @@ let Resource = {
         let data = options.data;
 
         let url = `${API_SERVER}/${service}/${resource}/`;
-
         if (options.method === "GET") {
             url += "?";
             for (let key in data) {
                 let value = data[key];
-                url += `${key}=${value}&`;
+                url += `${key}=${value}`;
             }
+            // url = url.trim('&');
         }
 
         return new Promise((resolve, reject) => {
