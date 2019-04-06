@@ -1,25 +1,26 @@
 <template>
   <div class="hello">
-    <!-- <c-title :text="title"></c-title> -->
+    <!-- <c-title :text="title"></c-title>
     <img class="logo" src="./../assets/images/logo.png">
     <p class="welcome">改版中，敬请期待...</p>
-    <div v-html="content"></div>
+    <div v-html="content"></div> -->
     <audio autoplay="true" loop="true" src="http://music.163.com/song/media/outer/url?id=300136.mp3"></audio>
+    <loading></loading>
   </div>
 </template>
 
 <script>
-
-  import {mapState} from 'vuex';
-  import cTitle from 'components/title';
   import Vue from 'vue';
+  import {mapState} from 'vuex';
   import Resource from '../lib/resource';
+  import cTitle from 'components/title';
+  import loading from 'components/loading';
 
   export default {
     data () {
         return {
             title: '改版中，敬请期待...',
-            content: ''
+            content: '',
         }
     },
     created() {      
@@ -81,7 +82,10 @@
       this.getContent();
     },
 
-    components: {cTitle}
+    components: {
+      cTitle,
+      loading,
+    }
   }
 
 </script>
