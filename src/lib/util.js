@@ -14,5 +14,14 @@ let Util = {
     getFixedNum(num, length) {
         return ('' + num).length < length ? ((new Array(length + 1)).join('0') + num).slice(-length) : '' + num;
     },
+
+    async loadImage(src) {
+        return new Promise((resolve, reject) => {
+            let img = new Image();
+            img.src = src;
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+        })
+    },
 }
 export default Util;

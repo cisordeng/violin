@@ -1,33 +1,44 @@
 <template>
-    <div class="v-music-background" :style="curSong && curSong.avatar ? `background-image: url(${curSong.avatar});` : ''">
+    <div class="v-snow">
+        <div class="v-music-background" :class="status === 'loading' ? 'v-change' : ''" :style="curSong && curSong.avatar ? `background-image: url(${curSong.avatar});` : ''">   
+            <audio ref="audio" :src="curSong && curSong.src" :autoplay="autoplay" :multed="multed"></audio>
+            <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:300,400,700" rel="stylesheet">
+            <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        </div>
         <div class="v-music-screen">
             <div class="v-i-info">
                 <div class="v-i-song">{{ curSong && curSong.name }}</div>
                 <div class="v-i-singer">{{ curSong && curSong.singer }}</div>
             </div>
             <div class="v-i-control" :class="control ? '' : 'v-i-hide'" @mouseover="() => { this.control = true;this.mouseOverControl = true; }" @mouseleave="onHideControl">
-                <progress class="v-i-progress" :value="playedRate" max="100" @click="onChangeProgress"></progress>
+                <div class="v-i-progress" @click="onChangeProgress" ref="progress">
+                    <div class="v-i-fill" :style="`width: ${playedRate}%;`">
+                        <div class="v-i-drager"></div>
+                    </div>
+                </div>
                 <div class="v-i-playtoggle v-i-button">
                     <div class="v-i-loading" :class="status === 'loading' ? '' : 'v-i-hide'"><i class="fa fa-spinner" aria-hidden="true"></i></div>
                     <div class="v-i-play" :class="status === 'playing' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fa fa-pause" aria-hidden="true"></i></div>
                     <div class="v-i-pause" :class="status === 'paused' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fa fa-play" aria-hidden="true"></i></div>
                 </div>
                 <div class="v-i-button" @click="onForward"><i class="fa fa-forward" aria-hidden="true"></i></div>
+                <div class="v-i-playmodetoggle v-i-button" @click="onPlayMode">
+                    <div class="v-i-loopset" :class="playMode === 'loopset' ? '' : 'v-i-hide'"><i class="fa fa-retweet" aria-hidden="true"></i></div>
+                    <div class="v-i-loopone" :class="playMode === 'loopone' ? '' : 'v-i-hide'" style="font-weight: bold;">1</div>
+                    <div class="v-i-random" :class="playMode === 'random' ? '' : 'v-i-hide'"><i class="fa fa-random" aria-hidden="true"></i></div>
+                </div>
                 <div class="v-i-time">
                     <div class="v-i-current">{{ currentTime }}</div>
                     <div>/</div>
                     <div class="v-i-end">{{ duration }}</div>
                 </div>
             </div>
-        </div>
-        <div class="v-i-sets" >
-            <div class="v-i-set">
-                <div class="v-i-song"></div>
+            <div class="v-i-sets" >
+                <div class="v-i-set">
+                    <div class="v-i-song"></div>
+                </div>
             </div>
         </div>
-        <audio ref="audio" :src="curSong && curSong.src" :autoplay="autoplay" :multed="multed"></audio>
-        <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:300,400,700" rel="stylesheet">
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     </div>
 </template>
 
@@ -59,7 +70,7 @@ export default {
         },
         playMode: {
             type: String,
-            default: "looplist",
+            default: "random",
         },
         showMode: {
             type: String,
@@ -87,7 +98,7 @@ export default {
     methods: {
         
         onChangeProgress(e) {
-            var rate = e.offsetX / e.target.offsetWidth;
+            var rate = e.offsetX / this.$refs.progress.offsetWidth;
             this.$refs.audio.currentTime = this.$refs.audio.duration * rate;
             if (this.$refs.audio.paused) {
                 this.onPlayPause();
@@ -112,6 +123,7 @@ export default {
                 return;
             }
             if (audio.paused) {
+                document.title = `${this.curSong.name} - ${this.curSong.singer}`;
                 this.autoplay = true;
                 this.$refs.audio.play();
                 this.status = "playing";
@@ -151,11 +163,11 @@ export default {
         },
 
         onForward() {
-            var index = this.curSong.index + 1;
-            if (index + 1 >= this.curSet.songs.length) {
-                index = 0;
-            }
-            this.changeSong(this.curSet.songs[index]);
+            this.changeSong(this.getSong("next"));
+        },
+
+        onPlayMode() {
+            this.playMode = this.getPlayMode();
         },
 
         onInterval() {
@@ -165,14 +177,42 @@ export default {
             }, 500);
         },
 
+        getPlayMode() {
+            switch (this.playMode) {
+                case "loopset":
+                    return "loopone";
+                case "loopone":
+                    return "random";
+                case "random":
+                    return "loopset";
+            }
+        },
+
+        getSong(type) {
+            switch (this.playMode) {
+                case "loopset":
+                    type = type || "next";
+                    var index = this.curSong.index + (type === "next" ? 1 : (type === "pre" ? -1 : 0));
+                    return index + 1 >= this.curSet.songs.length ? this.curSet.songs[0] : this.curSet.songs[index];
+                case "loopone":
+                    var index = this.curSong.index + (type === "next" ? 1 : (type === "pre" ? -1 : 0));
+                    return index + 1 >= this.curSet.songs.length ? this.curSet.songs[0] : this.curSet.songs[index];
+                case "random":
+                    type = type || "next";
+                    var index = parseInt(Math.random() * this.curSet.songs.length - 1);
+                    return this.curSet.songs[index];
+            }
+        },
+
         changeSong(song) {
             this.onPause();
             this.status = "loading";
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (!song.src) {
                     console.log("warn src is", song.src);
                     return;
                 }
+                await Util.loadImage(song.avatar);
                 this.curSong = song;
                 this.resetSong();
                 this.onPlay();
@@ -273,6 +313,7 @@ export default {
         that.$refs.audio.addEventListener("ended",function(){
             console.log('ended');
             that.status = 'paused';
+            that.changeSong(that.getSong());
         });
         that.$forceUpdate();
     }
@@ -289,6 +330,11 @@ export default {
         background-image: url(http://www.17sucai.com/preview/1424582/2018-10-14/music/earth-space.jpg);
         background-position: center;
         background-size: cover;
+        filter: blur(10px);
+        transition: 0.4s all;
+    }
+    .v-change{
+        filter: blur(20px);
     }
     .v-music-screen{
         position: fixed;
@@ -339,12 +385,32 @@ export default {
             .v-i-playtoggle{
                 .v-i-play, .v-i-pause{
                     position: absolute;
+                    width: 50px;
+                    height: 50px;
                     transition: 0.4s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .v-i-loading{
                     position: absolute;
                     transition: 0.4s;
                     animation: trans 2s linear infinite;
+                }
+                .v-i-hide{
+                    opacity: 0;
+                    transform: scale(0.25);
+                }
+            }
+            .v-i-playmodetoggle{
+                .v-i-loopset, .v-i-loopone, .v-i-random{
+                    position: absolute;
+                    width: 50px;
+                    height: 50px;
+                    transition: 0.4s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .v-i-hide{
                     opacity: 0;
@@ -372,14 +438,34 @@ export default {
                 height: 4px;
                 width: 100%;
                 background-color: rgba(255, 255, 255, 0.2);
-                transition: 0.4s;
+                transition: 0.4s all;
                 cursor: pointer;
-            }
-            .v-i-progress::-webkit-progress-value{
-                background-color:#c62828;
+                .v-i-fill{
+                    background-color:#c62828;
+                    position: relative;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    transition: 0.2s all;
+                    .v-i-drager{
+                        opacity: 0;
+                        background-color:#c62828;
+                        position: absolute;
+                        right: -8px;
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 50%;
+                        transition: 0.4s all;
+                    }
+                }
             }
             .v-i-progress:hover{
                 height: 6px;
+                .v-i-fill{
+                    .v-i-drager{
+                        opacity: 0.8;
+                    }
+                }
             }
         }
         .v-i-hide{
