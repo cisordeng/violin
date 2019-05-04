@@ -22,7 +22,7 @@ let Resource = {
         return new Promise((resolve, reject) => {
             Vue.http[options.method.toLocaleLowerCase()](url, data).then(resp =>{
                 if (resp.data.code === 200) {
-                    resolve(resp.data);
+                    resolve(resp.data.data);
                 } else {
                     reject(resp.data);
                 }

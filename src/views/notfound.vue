@@ -1,13 +1,11 @@
 <template>
   <div>
-    <c-title :text="title" :hide="true"></c-title>
     <p>{{ message }}</p>
   </div>
 </template>
 
 <script>
   import {mapState} from 'vuex'
-  import cTitle from 'components/title';
 
   export default {
     data () {
@@ -21,6 +19,6 @@
     mounted: function () {
       this.$store.commit('message', '404 Not Found！');
     },
-    components: {cTitle}
+    components: {},
   }
 </script>
