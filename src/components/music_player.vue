@@ -27,6 +27,7 @@
                     <div class="v-i-loopone" :class="playMode === 'loopone' ? '' : 'v-i-hide'" style="font-weight: bold;">1</div>
                     <div class="v-i-random" :class="playMode === 'random' ? '' : 'v-i-hide'"><i class="fa fa-random" aria-hidden="true"></i></div>
                 </div>
+                <div class="v-i-button" @click="onVolume(true)"><i class="fa fa-forward" aria-hidden="true"></i></div>
                 <div class="v-i-time">
                     <div class="v-i-current">{{ currentTime }}</div>
                     <div>/</div>
@@ -170,6 +171,16 @@ export default {
             this.playMode = this.getPlayMode();
         },
 
+        onVolume(tap=false) {
+            if (tap) {
+                this.multed = !this.multed;
+                return;
+            }
+            var rate = e.offsetY / this.$refs.volume-progress.offsetHeight;
+            this.$refs.audio.volume = 1 * rate;
+            this.volume = this.$refs.audio.volume;
+        },
+
         onInterval() {
             var that = this;
             var timer = setInterval(() => {
@@ -260,7 +271,7 @@ export default {
                     return;
                 }
             }
-            console(this.curSong, this.curSet, this.sets, this.resource);
+            console.log(this.curSong, this.curSet, this.sets, this.resource);
             console.warn("snow music player init fail~");
         },
 
@@ -331,6 +342,7 @@ export default {
         background-position: center;
         background-size: cover;
         filter: blur(10px);
+        transform: scale(1.1);
         transition: 0.4s all;
     }
     .v-change{

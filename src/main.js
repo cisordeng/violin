@@ -12,6 +12,8 @@ Vue.use(Vuex);
 Vue.use(VueRouter);
 Vue.use(VueResource);
 
+Vue.config.silent = true;
+
 // 创建一个路由对象用于管理页面的路由
 const router = new VueRouter({
   mode: 'history',
