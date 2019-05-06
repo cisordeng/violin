@@ -1,9 +1,9 @@
 <template>
     <div class="v-snow">
         <div class="v-music-background" :class="status === 'loading' ? 'v-change' : ''" :style="curSong && curSong.avatar ? `background-image: url(${curSong.avatar});` : ''">   
-            <audio ref="audio" :src="curSong && curSong.src" :autoplay="autoplay" :multed="multed"></audio>
+            <audio ref="audio" :src="curSong && curSong.src" :autoplay="autoplay"></audio>
             <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:300,400,700" rel="stylesheet">
-            <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
         </div>
         <div class="v-music-screen">
             <div class="v-i-info">
@@ -17,17 +17,27 @@
                     </div>
                 </div>
                 <div class="v-i-playtoggle v-i-button">
-                    <div class="v-i-loading" :class="status === 'loading' ? '' : 'v-i-hide'"><i class="fa fa-spinner" aria-hidden="true"></i></div>
-                    <div class="v-i-play" :class="status === 'playing' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fa fa-pause" aria-hidden="true"></i></div>
-                    <div class="v-i-pause" :class="status === 'paused' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fa fa-play" aria-hidden="true"></i></div>
+                    <div class="v-i-loading" :class="status === 'loading' ? '' : 'v-i-hide'"><i class="fas fa-spinner" aria-hidden="true"></i></div>
+                    <div class="v-i-play" :class="status === 'playing' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fas fa-pause" aria-hidden="true"></i></div>
+                    <div class="v-i-pause" :class="status === 'paused' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fas fa-play" aria-hidden="true"></i></div>
                 </div>
-                <div class="v-i-button" @click="onForward"><i class="fa fa-forward" aria-hidden="true"></i></div>
+                <div class="v-i-button" @click="onForward"><i class="fas fa-forward" aria-hidden="true"></i></div>
                 <div class="v-i-playmodetoggle v-i-button" @click="onPlayMode">
-                    <div class="v-i-loopset" :class="playMode === 'loopset' ? '' : 'v-i-hide'"><i class="fa fa-retweet" aria-hidden="true"></i></div>
+                    <div class="v-i-loopset" :class="playMode === 'loopset' ? '' : 'v-i-hide'"><i class="fas fa-retweet" aria-hidden="true"></i></div>
                     <div class="v-i-loopone" :class="playMode === 'loopone' ? '' : 'v-i-hide'" style="font-weight: bold;">1</div>
-                    <div class="v-i-random" :class="playMode === 'random' ? '' : 'v-i-hide'"><i class="fa fa-random" aria-hidden="true"></i></div>
+                    <div class="v-i-random" :class="playMode === 'random' ? '' : 'v-i-hide'"><i class="fas fa-random" aria-hidden="true"></i></div>
                 </div>
-                <div class="v-i-button" @click="onVolume(true)"><i class="fa fa-forward" aria-hidden="true"></i></div>
+                <div class="v-i-volumetoggle v-i-button" @click="onVolume(true)">
+                    <div class="v-i-muted" :class="muted ? '' : 'v-i-hide'"><i class="fas fa-volume-mute" aria-hidden="true"></i></div>
+                    <div class="v-i-off" :class="!muted && volume === 0 ? '' : 'v-i-hide'"><i class="fas fa-volume-off" aria-hidden="true"></i></div>
+                    <div class="v-i-down" :class="!muted && volume > 0 && volume <= 0.5 ? '' : 'v-i-hide'"><i class="fas fa-volume-down" aria-hidden="true"></i></div>
+                    <div class="v-i-up" :class="!muted && volume > 0.5 && volume <= 1 ? '' : 'v-i-hide'"><i class="fas fa-volume-up" aria-hidden="true"></i></div>
+                    <div class="v-i-progress" @click="onVolume" ref="volume-progress">
+                        <div class="v-i-fill" :style="`height: ${volume * 100}%;`">
+                            <div class="v-i-drager"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="v-i-time">
                     <div class="v-i-current">{{ currentTime }}</div>
                     <div>/</div>
@@ -77,7 +87,7 @@ export default {
             type: String,
             default: "screen",
         },
-        multed: {
+        muted: {
             type: Boolean,
             default: false,
         }
@@ -173,9 +183,47 @@ export default {
 
         onVolume(tap=false) {
             if (tap) {
-                this.multed = !this.multed;
+                var audio = this.$refs.audio;
+                if (!audio.src) {
+                    return;
+                }
+                this.muted = !this.muted;
+                if (!this.muted) {
+                    this.$refs.audio.muted = this.muted;
+                    var volume = 0;
+                    var i = this.volume / 8;
+                    var timer = setInterval(() => {
+                        if (volume === this.volume) {
+                            clearInterval(timer);
+                            return;
+                        } else {
+                            volume += i;
+                            if (volume > this.volume) {
+                                volume = this.volume;
+                            }
+                            this.$refs.audio.volume = volume;
+                        }
+                    }, 100);
+                } else {
+                    var volume = this.volume;
+                    var i = volume / 8;
+                    var timer = setInterval(() => {
+                        if (volume === 0) {
+                            this.$refs.audio.muted = this.muted;
+                            clearInterval(timer);
+                            return;
+                        } else {
+                            volume -= i;
+                            if (volume < 0) {
+                                volume = 0;
+                            }
+                            this.$refs.audio.volume = volume;
+                        }
+                    }, 100);
+                }
                 return;
             }
+
             var rate = e.offsetY / this.$refs.volume-progress.offsetHeight;
             this.$refs.audio.volume = 1 * rate;
             this.volume = this.$refs.audio.volume;
@@ -301,7 +349,6 @@ export default {
                     songs: songs,
                 });
             });
-            console.log(sets);
             return sets;
         },
     },
@@ -313,10 +360,10 @@ export default {
     mounted() {
         document.title = "Snow Music Player";
 
-        console.log(this.sets);
-
         var that = this;
+        
         this.$refs.audio.volume = this.volume;
+        this.$refs.audio.muted = this.muted;
         this.status = this.autoplay ? "playing" : "paused";
         this.onInterval();
         this.onHideControl();
@@ -429,7 +476,61 @@ export default {
                     transform: scale(0.25);
                 }
             }
-            
+            .v-i-volumetoggle{
+                position: relative;
+                .v-i-muted, .v-i-off, .v-i-down, .v-i-up{
+                    position: absolute;
+                    width: 50px;
+                    height: 50px;
+                    transition: 0.4s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .v-i-progress{
+                    position: absolute;
+                    left: 0;
+                    bottom: 50px;
+                    width: 4px;
+                    height: 100%;
+                    opacity: 0;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    transition: 0.4s opacity;
+                    cursor: pointer;
+                    .v-i-fill{
+                        background-color:#c62828;
+                        position: relative;
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        transition: 0.2s all;
+                        .v-i-drager{
+                            opacity: 0.8;
+                            background-color:#c62828;
+                            position: absolute;
+                            top: -8px;
+                            width: 16px;
+                            height: 16px;
+                            border-radius: 50%;
+                            transition: 0.4s all;
+                        }
+                    }
+                }
+
+                .v-i-hide{
+                    opacity: 0;
+                    transform: scale(0.25);
+                }
+            }
+
+            .v-i-volumetoggle:hover{
+                .v-i-progress{
+                    width: 4px;
+                    opacity: 1;
+                }
+            }
+
             .v-i-time{
                 display: flex;
                 align-items: center;
