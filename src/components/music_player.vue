@@ -27,14 +27,20 @@
                     <div class="v-i-loopone" :class="playMode === 'loopone' ? '' : 'v-i-hide'" style="font-weight: bold;">1</div>
                     <div class="v-i-random" :class="playMode === 'random' ? '' : 'v-i-hide'"><i class="fas fa-random" aria-hidden="true"></i></div>
                 </div>
-                <div class="v-i-volumetoggle v-i-button" @click="onVolume(true)">
-                    <div class="v-i-muted" :class="muted ? '' : 'v-i-hide'"><i class="fas fa-volume-mute" aria-hidden="true"></i></div>
-                    <div class="v-i-off" :class="!muted && volume === 0 ? '' : 'v-i-hide'"><i class="fas fa-volume-off" aria-hidden="true"></i></div>
-                    <div class="v-i-down" :class="!muted && volume > 0 && volume <= 0.5 ? '' : 'v-i-hide'"><i class="fas fa-volume-down" aria-hidden="true"></i></div>
-                    <div class="v-i-up" :class="!muted && volume > 0.5 && volume <= 1 ? '' : 'v-i-hide'"><i class="fas fa-volume-up" aria-hidden="true"></i></div>
-                    <div class="v-i-progress" @click="onVolume" ref="volume-progress">
-                        <div class="v-i-fill" :style="`height: ${volume * 100}%;`">
-                            <div class="v-i-drager"></div>
+                <div class="v-i-volume">
+                    <div class="v-i-volumetoggle v-i-button" @click="onVolume($event, true)">
+                        <div class="v-i-muted" :class="muted ? '' : 'v-i-hide'"><i class="fas fa-volume-mute" aria-hidden="true"></i></div>
+                        <div class="v-i-off" :class="!muted && volume === 0 ? '' : 'v-i-hide'"><i class="fas fa-volume-off" aria-hidden="true"></i></div>
+                        <div class="v-i-down" :class="!muted && volume > 0 && volume <= 0.5 ? '' : 'v-i-hide'"><i class="fas fa-volume-down" aria-hidden="true"></i></div>
+                        <div class="v-i-up" :class="!muted && volume > 0.5 && volume <= 1 ? '' : 'v-i-hide'"><i class="fas fa-volume-up" aria-hidden="true"></i></div>
+                    </div>
+                    <div class="v-i-volumeback">
+                        <div class="v-i-volumeprogress" @click="onVolume($event)" ref="volumeprogress">
+                            <div class="v-i-fill" :style="`height: ${volume * 100}%;`">
+                                <div class="v-i-drager" @click.stop="">
+                                    <div class="v-i-text">{{parseInt(volume * 100)}}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -181,7 +187,7 @@ export default {
             this.playMode = this.getPlayMode();
         },
 
-        onVolume(tap=false) {
+        onVolume(e, tap=false) {
             if (tap) {
                 var audio = this.$refs.audio;
                 if (!audio.src) {
@@ -224,9 +230,11 @@ export default {
                 return;
             }
 
-            var rate = e.offsetY / this.$refs.volume-progress.offsetHeight;
-            this.$refs.audio.volume = 1 * rate;
-            this.volume = this.$refs.audio.volume;
+            console.log(e);
+
+            var rate = e.offsetY / this.$refs.volumeprogress.offsetHeight;
+            this.volume = 1 * rate < 0 ? 0 : 1 * rate;
+            this.$refs.audio.volume = this.volume;
         },
 
         onInterval() {
@@ -476,61 +484,98 @@ export default {
                     transform: scale(0.25);
                 }
             }
-            .v-i-volumetoggle{
-                position: relative;
-                .v-i-muted, .v-i-off, .v-i-down, .v-i-up{
-                    position: absolute;
-                    width: 50px;
-                    height: 50px;
-                    transition: 0.4s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
+            .v-i-volume{
+                width: 50px;
+                height: 50px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: 0.4s all;
+                .v-i-volumetoggle{
+                    position: relative;
+                    .v-i-muted, .v-i-off, .v-i-down, .v-i-up{
+                        position: absolute;
+                        width: 50px;
+                        height: 50px;
+                        transition: 0.4s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .v-i-hide{
+                        opacity: 0;
+                        transform: scale(0.25);
+                    }
                 }
-
-                .v-i-progress{
+                .v-i-volumeback{
                     position: absolute;
-                    left: 0;
-                    bottom: 50px;
-                    width: 4px;
-                    height: 100%;
+                    bottom: 100%;
+                    width: 0;
+                    height: 180%;
                     opacity: 0;
                     background-color: rgba(255, 255, 255, 0.2);
                     transition: 0.4s opacity;
+                    transform: rotate(180deg);
                     cursor: pointer;
-                    .v-i-fill{
-                        background-color:#c62828;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 20px;
+                    .v-i-volumeprogress{
                         position: relative;
-                        width: 100%;
-                        display: flex;
-                        justify-content: center;
-                        transition: 0.2s all;
-                        .v-i-drager{
-                            opacity: 0.8;
+                        height: 70%;
+                        width: 0;
+                        background: rgba(255, 255, 255, 0.2);
+                        .v-i-fill{
                             background-color:#c62828;
-                            position: absolute;
-                            top: -8px;
-                            width: 16px;
-                            height: 16px;
-                            border-radius: 50%;
-                            transition: 0.4s all;
+                            position: relative;
+                            bottom: 0;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            transition: 0.2s all;
+                            .v-i-drager{
+                                opacity: 0;
+                                background-color:#c62828;
+                                position: absolute;
+                                bottom: -8px;
+                                width: 0;
+                                height: 16px;
+                                border-radius: 50%;
+                                transition: 0.4s all;
+                                transform: rotate(180deg);
+                                .v-i-text{
+                                    position: absolute;
+                                    right: -20px;
+                                    display: none;
+                                }
+                            }
                         }
                     }
                 }
-
-                .v-i-hide{
-                    opacity: 0;
-                    transform: scale(0.25);
-                }
             }
-
-            .v-i-volumetoggle:hover{
-                .v-i-progress{
-                    width: 4px;
+            .v-i-volume:hover{
+                .v-i-volumeback{
+                    width: 24px;
                     opacity: 1;
+                    .v-i-volumeprogress{
+                        width: 6px;
+                    }
+                }
+                .v-i-volumeback:hover{
+                    width: 24px;
+                    .v-i-fill{
+                        .v-i-drager{
+                            opacity: 0.8;
+                            width: 16px;
+                            .v-i-text{
+                                display: inline;
+                            }
+                        }
+                    }
                 }
             }
-
             .v-i-time{
                 display: flex;
                 align-items: center;
