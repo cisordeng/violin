@@ -50,9 +50,34 @@
                     <div class="v-i-end">{{ duration }}</div>
                 </div>
             </div>
-            <div class="v-i-sets" >
-                <div class="v-i-set">
-                    <div class="v-i-song"></div>
+            <div class="v-i-list" @click="onClickSetSong"><i class="fas fa-th-list" aria-hidden="true"></i></div>
+            <div class="v-i-setsong" :class="showSetSong ? '' : 'v-i-hidesetsong'">
+                <div class="v-i-sets" >
+                    <div
+                        v-for="(set, index) in sets"
+                        :key="index"
+                        class="v-i-set"
+                        :class="activeSet.index === index ? 'v-i-active' : ''"
+                        @click="onClickSet(set)"
+                    >
+                        <div class="v-i-icon"><i class="fas fa-list" aria-hidden="true"></i></div>
+                        <div class="v-i-name">{{set.name}}</div>
+                    </div>
+                </div>
+                <div v-if="activeSet" class="v-i-songs">
+                    <div v-if="activeSet.songs.length <= 0" class="v-i-tip">歌单暂无歌曲</div>
+                    <div
+                        v-for="(song, index) in activeSet.songs"
+                        :key="index"
+                        class="v-i-song"
+                        :class="curSong.index === index ? 'v-i-active' : ''"
+                        @click="onClickSong(song)"
+                    >
+                        <div class="v-i-icon"><i class="fas fa-music" aria-hidden="true"></i></div>
+                        <div class="v-i-name">{{song.name}}</div>
+                        <div class="v-i-singer">{{song.singer}}</div>
+                        <div class="v-i-count">{{song.playedCount}}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,7 +112,7 @@ export default {
         },
         playMode: {
             type: String,
-            default: "random",
+            default: "loopset",
         },
         showMode: {
             type: String,
@@ -109,6 +134,8 @@ export default {
             control: true,
 
             mouseOverControl: false,
+            showSetSong: false,
+            activeSet: null,
         }
     },
 
@@ -122,19 +149,19 @@ export default {
             }
         },
 
-        onPlay() {
+        onPlay(gradual=true) {
             if (this.$refs.audio.paused) {
-                this.onPlayPause();
+                this.onPlayPause(gradual);
             }
         },
 
-        onPause() {
+        onPause(gradual=true) {
             if (!this.$refs.audio.paused) {
-                this.onPlayPause();
+                this.onPlayPause(gradual);
             }
         },
 
-        onPlayPause() {
+        onPlayPause(gradual=true) {
             var audio = this.$refs.audio;
             if (!audio.src) {
                 return;
@@ -144,38 +171,43 @@ export default {
                 this.autoplay = true;
                 this.$refs.audio.play();
                 this.status = "playing";
-
-                var volume = 0;
-                var i = this.volume / 8;
-                var timer = setInterval(() => {
-                    if (volume === this.volume) {
-                        clearInterval(timer);
-                        return;
-                    } else {
-                        volume += i;
-                        if (volume > this.volume) {
-                            volume = this.volume;
+                if (gradual) {
+                    var volume = 0;
+                    var i = this.volume / 8;
+                    var timer = setInterval(() => {
+                        if (volume === this.volume) {
+                            clearInterval(timer);
+                            return;
+                        } else {
+                            volume += i;
+                            if (volume > this.volume) {
+                                volume = this.volume;
+                            }
+                            this.$refs.audio.volume = volume;
                         }
-                        this.$refs.audio.volume = volume;
-                    }
-                }, 100);
+                    }, 100);
+                }
             } else {
                 this.status = "paused";
-                var volume = this.volume;
-                var i = volume / 8;
-                var timer = setInterval(() => {
-                    if (volume === 0) {
-                        this.$refs.audio.pause();
-                        clearInterval(timer);
-                        return;
-                    } else {
-                        volume -= i;
-                        if (volume < 0) {
-                            volume = 0;
+                if (gradual) {
+                    var volume = this.volume;
+                    var i = volume / 8;
+                    var timer = setInterval(() => {
+                        if (volume === 0) {
+                            this.$refs.audio.pause();
+                            clearInterval(timer);
+                            return;
+                        } else {
+                            volume -= i;
+                            if (volume < 0) {
+                                volume = 0;
+                            }
+                            this.$refs.audio.volume = volume;
                         }
-                        this.$refs.audio.volume = volume;
-                    }
-                }, 100);
+                    }, 100);
+                } else {
+                    this.$refs.audio.pause();
+                }
             }
         },
 
@@ -271,20 +303,17 @@ export default {
             }
         },
 
-        changeSong(song) {
-            this.onPause();
+        async changeSong(song) {
+            this.onPause(false);
             this.status = "loading";
-            setTimeout(async () => {
-                if (!song.src) {
-                    console.log("warn src is", song.src);
-                    return;
-                }
-                await Util.loadImage(song.avatar);
-                this.curSong = song;
-                this.resetSong();
-                this.onPlay();
-            }, 1000);
-            this.$forceUpdate();
+            if (!song.src) {
+                console.log("warn src is", song.src);
+                return;
+            }
+            this.curSong = song;
+            await Util.loadImage(song.avatar);
+            this.resetSong();
+            this.onPlay(false);
         },
         
         resetSong() {
@@ -296,7 +325,7 @@ export default {
             var that = this;
             that.mouseOverControl = false;
             setTimeout(() => {
-                if (that.mouseOverControl) {
+                if (that.mouseOverControl || that.status == "paused") {
                     return;
                 }
                 that.control = false;
@@ -309,11 +338,15 @@ export default {
             }
             if (this.curSet && this.curSet.songs && this.curSet.songs[0]) {
                 this.curSong = this.curSet.songs[0];
+
+                this.activeSet = this.curSet;
                 return;
             }
             if (this.sets && this.sets[0] && this.sets[0].songs && this.sets[0].songs[0]) {
                 this.curSet = this.sets[0];
                 this.curSong = this.curSet.songs[0];
+
+                this.activeSet = this.curSet;
                 return;
             }
             if (this.resource) {
@@ -324,6 +357,8 @@ export default {
                 if (this.sets && this.sets[0] && this.sets[0].songs && this.sets[0].songs[0]) {
                     this.curSet = this.sets[0];
                     this.curSong = this.curSet.songs[0];
+
+                    this.activeSet = this.curSet;
                     return;
                 }
             }
@@ -359,6 +394,21 @@ export default {
             });
             return sets;
         },
+
+        onClickSet(set) {
+            this.activeSet = set;
+        },
+
+        onClickSong(song) {
+            this.changeSong(song);
+            if (this.activeSet.index != this.curSet.index) {
+                this.curSet = this.activeSet;
+            }
+        },
+
+        onClickSetSong() {
+            this.showSetSong = !this.showSetSong;
+        },
     },
 
     async beforeMount() {
@@ -381,7 +431,6 @@ export default {
             that.status = 'paused';
             that.changeSong(that.getSong());
         });
-        that.$forceUpdate();
     }
 }
 </script>
@@ -410,12 +459,14 @@ export default {
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.6);
-        font-family: 'Barlow Condensed', sans-serif;
+        display: flex;
+        flex-direction: column;
         .v-i-info{
             right: 0;
             padding: 1rem;
             color: #fff;
             animation: bounce-in-right 1s ease-in;
+            font-family: 'Barlow Condensed', sans-serif;
             .v-i-song{
                 text-align: right;
                 font-size: 2rem;
@@ -580,6 +631,7 @@ export default {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                font-family: 'Barlow Condensed', sans-serif;
                 .v-i-current{
                     padding: 0 0.5rem;
                     width: 1.5rem;
@@ -628,6 +680,137 @@ export default {
         }
         .v-i-hide{
             transform: translateY(100%);
+        }
+        .v-i-list{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            color: #fff;
+            opacity: 0.8;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .v-i-list:hover{
+            opacity: 1;
+        }
+        .v-i-setsong{
+            position: absolute;
+            width: 500px;
+            height: 50%;
+            background: #eef3f7;
+            display: flex;
+            margin: 0 auto;
+            border-radius: 8px;
+            color: #71829e;
+            font-size: 12px;
+            box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
+            overflow: hidden;
+            transform: scale(1);
+            transition: 0.4s;
+            left: calc(50% - 250px);
+            top: 25%;
+            ::-webkit-scrollbar{
+                width: 5px;
+                height: 5px;
+            }
+            ::-webkit-scrollbar-thumb{
+                opacity: 0.5;
+                border-radius: 10px;
+                background-color:#dedede;
+            }
+            .v-i-sets{
+                width: 160px;
+                overflow-x: hidden;
+                overflow-y: auto;
+                .v-i-set{
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    opacity: 0.7;
+                    transition: 0.4s;
+                    &:hover{
+                        opacity: 1;
+                    }
+                    .v-i-icon{
+                        width: 12px;
+                        margin: 0 0 0 12px;
+                    }
+                    .v-i-name{
+                        margin: 8px 12px;
+                        text-align: left;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+                .v-i-active{
+                    opacity: 1;
+                    background: #dedede;
+                    border-radius: 8px;
+                }
+            }
+            .v-i-songs{
+                width: 80%;
+                overflow-x: hidden;
+                overflow-y: auto;
+                position: relative;
+                .v-i-tip{
+                    margin: 10px;
+                }
+                .v-i-song{
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    opacity: 0.7;
+                    transition: 0.4s;
+                    &:hover{
+                        opacity: 1;
+                    }
+                    .v-i-icon{
+                        width: 12px;
+                        margin: 0 0 0 12px;
+                    }
+                    .v-i-name{
+                        width: 150px;
+                        margin: 8px 12px;
+                        text-align: left;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .v-i-singer{
+                        width: 130px;
+                        margin: 8px 12px;
+                        text-align: left;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .v-i-count{
+                        width: 60px;
+                        margin: 8px 12px;
+                        text-align: right;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+                .v-i-active{
+                    opacity: 1;
+                    background: #dedede;
+                    border-radius: 8px;
+                }
+            }
+        }
+        .v-i-hidesetsong{
+            transform: scale(0);
+            left: -250px;
+            top: -25%;
         }
     }
 
