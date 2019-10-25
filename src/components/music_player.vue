@@ -44,8 +44,8 @@
       <div class="progress">
         <div class="progress__top">
           <div class="album-info">
-            <div class="album-info__name">{{currentTrack && currentTrack.name}}</div>
-            <div class="album-info__track">{{currentTrack && currentTrack.artist}}</div>
+            <div class="album-info__name">{{currentTrack && currentTrack.artist}}</div>
+            <div class="album-info__track">{{currentTrack && currentTrack.name}}</div>
           </div>
           <div class="progress__duration">{{duration}}</div>
         </div>
