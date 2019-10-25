@@ -8,7 +8,7 @@
 					v-for="(track, index) in tracks"
 					:key="track.cover"
 					class="player-cover__item"
-					:style="`background-image: url(${index == currentTrackIndex ? track.cover : ''});`"
+					:style="`background-image: url(${(index == currentTrackIndex || index == (currentTrackIndex - 1 < 0 ? tracks.length - 1 : currentTrackIndex - 1) || index == (currentTrackIndex + 1 > tracks.length - 1 ? 0 : currentTrackIndex + 1)) ? track.cover : ''});`"
 					v-show="index == currentTrackIndex"
 				></div>
 			</transition-group>
