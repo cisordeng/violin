@@ -1,5 +1,4 @@
 import Resource from '../lib/resource';
-import Session from '../lib/session'
 import LoadMoreService from '../services/loadmore_service'
 
 class PageInfo {

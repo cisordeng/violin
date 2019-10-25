@@ -12,7 +12,7 @@ class RhythmService extends Service {
             resource: 'rhythm.rhythm_sets',
             data: {}
         })
-        return data;
+        return data.rhythm_sets;
     }
 }
 

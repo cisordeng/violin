@@ -1,849 +1,680 @@
 <template>
-    <div class="v-snow">
-        <div class="v-music-background" :class="status === 'loading' ? 'v-change' : ''" :style="curSong && curSong.avatar ? `background-image: url(${curSong.avatar});` : ''">   
-            <audio ref="audio" :src="curSong && curSong.src" :autoplay="autoplay"></audio>
-            <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:300,400,700" rel="stylesheet">
-            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <div class="wrapper">
+    <div class="player">
+      <div class="player__top">
+        <div class="player-cover">
+			<transition-group :name="transitionName">
+            	<div
+					v-for="(track, index) in tracks"
+					:key="track.cover"
+					class="player-cover__item"
+					:style="`background-image: url(${track.cover});`"
+					v-show="index == currentTrackIndex"
+				></div>
+			</transition-group>
         </div>
-        <div class="v-music-screen">
-            <div class="v-i-info">
-                <div class="v-i-song">{{ curSong && curSong.name }}</div>
-                <div class="v-i-singer">{{ curSong && curSong.singer }}</div>
-            </div>
-            <div class="v-i-control" :class="control ? '' : 'v-i-hide'" @mouseover="() => { this.control = true;this.mouseOverControl = true; }" @mouseleave="onHideControl">
-                <div class="v-i-progress" @click="onChangeProgress" ref="progress">
-                    <div class="v-i-fill" :style="`width: ${playedRate}%;`">
-                        <div class="v-i-drager"></div>
-                    </div>
-                </div>
-                <div class="v-i-playtoggle v-i-button">
-                    <div class="v-i-loading" :class="status === 'loading' ? '' : 'v-i-hide'"><i class="fas fa-spinner" aria-hidden="true"></i></div>
-                    <div class="v-i-play" :class="status === 'playing' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fas fa-pause" aria-hidden="true"></i></div>
-                    <div class="v-i-pause" :class="status === 'paused' ? '' : 'v-i-hide'" @click="onPlayPause"><i class="fas fa-play" aria-hidden="true"></i></div>
-                </div>
-                <div class="v-i-button" @click="onForward"><i class="fas fa-forward" aria-hidden="true"></i></div>
-                <div class="v-i-playmodetoggle v-i-button" @click="onPlayMode">
-                    <div class="v-i-loopset" :class="playMode === 'loopset' ? '' : 'v-i-hide'"><i class="fas fa-retweet" aria-hidden="true"></i></div>
-                    <div class="v-i-loopone" :class="playMode === 'loopone' ? '' : 'v-i-hide'" style="font-weight: bold;">1</div>
-                    <div class="v-i-random" :class="playMode === 'random' ? '' : 'v-i-hide'"><i class="fas fa-random" aria-hidden="true"></i></div>
-                </div>
-                <div class="v-i-volume">
-                    <div class="v-i-volumetoggle v-i-button" @click="onVolume($event, true)">
-                        <div class="v-i-muted" :class="muted ? '' : 'v-i-hide'"><i class="fas fa-volume-mute" aria-hidden="true"></i></div>
-                        <div class="v-i-off" :class="!muted && volume === 0 ? '' : 'v-i-hide'"><i class="fas fa-volume-off" aria-hidden="true"></i></div>
-                        <div class="v-i-down" :class="!muted && volume > 0 && volume <= 0.5 ? '' : 'v-i-hide'"><i class="fas fa-volume-down" aria-hidden="true"></i></div>
-                        <div class="v-i-up" :class="!muted && volume > 0.5 && volume <= 1 ? '' : 'v-i-hide'"><i class="fas fa-volume-up" aria-hidden="true"></i></div>
-                    </div>
-                    <div class="v-i-volumeback">
-                        <div class="v-i-volumeprogress" @click="onVolume($event)" ref="volumeprogress">
-                            <div class="v-i-fill" :style="`height: ${volume * 100}%;`">
-                                <div class="v-i-drager" @click.stop="">
-                                    <div class="v-i-text">{{parseInt(volume * 100)}}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="v-i-time">
-                    <div class="v-i-current">{{ currentTime }}</div>
-                    <div>/</div>
-                    <div class="v-i-end">{{ duration }}</div>
-                </div>
-            </div>
-            <div class="v-i-list" @click="onClickSetSong"><i class="fas fa-th-list" aria-hidden="true"></i></div>
-            <div class="v-i-setsong" :class="showSetSong ? '' : 'v-i-hidesetsong'">
-                <div class="v-i-sets" >
-                    <div
-                        v-for="(set, index) in sets"
-                        :key="index"
-                        class="v-i-set"
-                        :class="activeSet.index === index ? 'v-i-active' : ''"
-                        @click="onClickSet(set)"
-                    >
-                        <div class="v-i-icon"><i class="fas fa-list" aria-hidden="true"></i></div>
-                        <div class="v-i-name">{{set.name}}</div>
-                    </div>
-                </div>
-                <div v-if="activeSet" class="v-i-songs">
-                    <div v-if="activeSet.songs.length <= 0" class="v-i-tip">歌单暂无歌曲</div>
-                    <div
-                        v-for="(song, index) in activeSet.songs"
-                        :key="index"
-                        class="v-i-song"
-                        :class="curSong.index === index ? 'v-i-active' : ''"
-                        @click="onClickSong(song)"
-                    >
-                        <div class="v-i-icon"><i class="fas fa-music" aria-hidden="true"></i></div>
-                        <div class="v-i-name">{{song.name}}</div>
-                        <div class="v-i-singer">{{song.singer}}</div>
-                        <div class="v-i-count">{{song.playedCount}}</div>
-                    </div>
-                </div>
-            </div>
+        <div class="player-controls">
+          <div class="player-controls__item -favorite" :class="currentTrack && currentTrack.favorited ? 'active' : ''" @click="favorite">
+            <svg class="icon">
+              <use xlink:href="#icon-heart-o" />
+            </svg>
+          </div>
+          <a href="https://www.baidu.com/" target="_blank" class="player-controls__item">
+            <svg class="icon">
+              <use xlink:href="#icon-link" />
+            </svg>
+          </a>
+          <div class="player-controls__item" @click="prevTrack">
+            <svg class="icon">
+              <use xlink:href="#icon-prev" />
+            </svg>
+          </div>
+          <div class="player-controls__item" @click="nextTrack">
+            <svg class="icon">
+              <use xlink:href="#icon-next" />
+            </svg>
+          </div>
+          <div class="player-controls__item -xl js-play" @click="play">
+            <svg class="icon">
+              <use :xlink:href="isTimerPlaying ? '#icon-pause' : '#icon-play'" />
+            </svg>
+          </div>
         </div>
+      </div>
+      <div class="progress">
+        <div class="progress__top">
+          <div class="album-info">
+            <div class="album-info__name">{{currentTrack && currentTrack.name}}</div>
+            <div class="album-info__track">{{currentTrack && currentTrack.artist}}</div>
+          </div>
+          <div class="progress__duration">{{duration}}</div>
+        </div>
+        <div ref="progress" class="progress__bar" @click="clickProgress">
+          <div class="progress__current" :style="`width: ${barWidth};`"></div>
+        </div>
+        <div class="progress__time">{{currentTime}}</div>
+      </div>
+      <div></div>
     </div>
+
+    <svg style="display: none;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <defs>
+        <symbol id="icon-heart-o" viewBox="0 0 32 32">
+          <title>icon-heart-o</title>
+          <path
+            d="M22.88 1.952c-2.72 0-5.184 1.28-6.88 3.456-1.696-2.176-4.16-3.456-6.88-3.456-4.48 0-9.024 3.648-9.024 10.592 0 7.232 7.776 12.704 15.072 17.248 0.256 0.16 0.544 0.256 0.832 0.256s0.576-0.096 0.832-0.256c7.296-4.544 15.072-10.016 15.072-17.248 0-6.944-4.544-10.592-9.024-10.592zM16 26.56c-4.864-3.072-12.736-8.288-12.736-14.016 0-5.088 3.040-7.424 5.824-7.424 2.368 0 4.384 1.504 5.408 4.032 0.256 0.608 0.832 0.992 1.472 0.992s1.248-0.384 1.472-0.992c1.024-2.528 3.040-4.032 5.408-4.032 2.816 0 5.824 2.304 5.824 7.424 0.064 5.728-7.808 10.976-12.672 14.016z"
+          />
+          <path
+            d="M16 30.144c-0.32 0-0.64-0.096-0.896-0.256-7.296-4.576-15.104-10.048-15.104-17.344 0-7.008 4.576-10.688 9.12-10.688 2.656 0 5.152 1.216 6.88 3.392 1.728-2.144 4.224-3.392 6.88-3.392 4.544 0 9.12 3.68 9.12 10.688 0 7.296-7.808 12.768-15.104 17.344-0.256 0.16-0.576 0.256-0.896 0.256zM9.12 2.048c-4.448 0-8.928 3.616-8.928 10.496 0 7.168 7.744 12.64 15.008 17.152 0.48 0.288 1.12 0.288 1.568 0 7.264-4.544 15.008-9.984 15.008-17.152 0-6.88-4.48-10.496-8.928-10.496-2.656 0-5.088 1.216-6.816 3.392l-0.032 0.128-0.064-0.096c-1.696-2.176-4.192-3.424-6.816-3.424zM16 26.688l-0.064-0.032c-3.808-2.4-12.768-8.032-12.768-14.112 0-5.152 3.072-7.52 5.952-7.52 2.432 0 4.48 1.536 5.504 4.096 0.224 0.576 0.768 0.928 1.376 0.928s1.152-0.384 1.376-0.928c1.024-2.56 3.072-4.096 5.504-4.096 2.848 0 5.952 2.336 5.952 7.52 0 6.080-8.96 11.712-12.768 14.112l-0.064 0.032zM9.12 5.248c-2.752 0-5.728 2.304-5.728 7.328 0 5.952 8.8 11.488 12.608 13.92 3.808-2.4 12.608-7.968 12.608-13.92 0-5.024-2.976-7.328-5.728-7.328-2.336 0-4.32 1.472-5.312 3.968-0.256 0.64-0.864 1.056-1.568 1.056s-1.312-0.416-1.568-1.056c-0.992-2.496-2.976-3.968-5.312-3.968z"
+          />
+          <path
+            d="M6.816 20.704c0.384 0.288 0.512 0.704 0.48 1.12 0.224 0.256 0.384 0.608 0.384 0.96 0 0.032 0 0.032 0 0.064 0.16 0.128 0.32 0.256 0.48 0.384 0.128 0.064 0.256 0.16 0.384 0.256 0.096 0.064 0.192 0.16 0.256 0.224 0.8 0.576 1.632 1.12 2.496 1.664 0.416 0.128 0.8 0.256 1.056 0.32 1.984 0.576 4.064 0.8 6.112 0.928 2.688-1.92 5.312-3.904 8-5.792 0.896-1.088 1.92-2.080 2.912-3.104v-7.552c-0.096-0.128-0.192-0.288-0.32-0.416-0.768-1.024-1.184-2.176-1.6-3.296-0.768-0.416-1.536-0.8-2.336-1.12-0.128-0.064-0.256-0.096-0.384-0.16h-21.568v12.992c1.312 0.672 2.496 1.6 3.648 2.528z"
+          />
+        </symbol>
+        <symbol id="icon-heart" viewBox="0 0 32 32">
+          <title>icon-heart</title>
+          <path
+            d="M22.88 1.952c-2.72 0-5.184 1.28-6.88 3.456-1.696-2.176-4.16-3.456-6.88-3.456-4.48 0-9.024 3.648-9.024 10.592 0 7.232 7.776 12.704 15.072 17.248 0.256 0.16 0.544 0.256 0.832 0.256s0.576-0.096 0.832-0.256c7.296-4.544 15.072-10.016 15.072-17.248 0-6.944-4.544-10.592-9.024-10.592zM16 26.56c-4.864-3.072-12.736-8.288-12.736-14.016 0-5.088 3.040-7.424 5.824-7.424 2.368 0 4.384 1.504 5.408 4.032 0.256 0.608 0.832 0.992 1.472 0.992s1.248-0.384 1.472-0.992c1.024-2.528 3.040-4.032 5.408-4.032 2.816 0 5.824 2.304 5.824 7.424 0.064 5.728-7.808 10.976-12.672 14.016z"
+          />
+          <path
+            d="M16 30.144c-0.32 0-0.64-0.096-0.896-0.256-7.296-4.576-15.104-10.048-15.104-17.344 0-7.008 4.576-10.688 9.12-10.688 2.656 0 5.152 1.216 6.88 3.392 1.728-2.144 4.224-3.392 6.88-3.392 4.544 0 9.12 3.68 9.12 10.688 0 7.296-7.808 12.768-15.104 17.344-0.256 0.16-0.576 0.256-0.896 0.256zM9.12 2.048c-4.448 0-8.928 3.616-8.928 10.496 0 7.168 7.744 12.64 15.008 17.152 0.48 0.288 1.12 0.288 1.568 0 7.264-4.544 15.008-9.984 15.008-17.152 0-6.88-4.48-10.496-8.928-10.496-2.656 0-5.088 1.216-6.816 3.392l-0.032 0.128-0.064-0.096c-1.696-2.176-4.192-3.424-6.816-3.424zM16 26.688l-0.064-0.032c-3.808-2.4-12.768-8.032-12.768-14.112 0-5.152 3.072-7.52 5.952-7.52 2.432 0 4.48 1.536 5.504 4.096 0.224 0.576 0.768 0.928 1.376 0.928s1.152-0.384 1.376-0.928c1.024-2.56 3.072-4.096 5.504-4.096 2.848 0 5.952 2.336 5.952 7.52 0 6.080-8.96 11.712-12.768 14.112l-0.064 0.032zM9.12 5.248c-2.752 0-5.728 2.304-5.728 7.328 0 5.952 8.8 11.488 12.608 13.92 3.808-2.4 12.608-7.968 12.608-13.92 0-5.024-2.976-7.328-5.728-7.328-2.336 0-4.32 1.472-5.312 3.968-0.256 0.64-0.864 1.056-1.568 1.056s-1.312-0.416-1.568-1.056c-0.992-2.496-2.976-3.968-5.312-3.968z"
+          />
+        </symbol>
+        <symbol id="icon-infinity" viewBox="0 0 32 32">
+          <title>icon-infinity</title>
+          <path
+            d="M29.312 20.832c-1.28 1.28-3.008 1.984-4.832 1.984s-3.52-0.704-4.832-1.984c-0.032-0.032-0.224-0.224-0.256-0.256v0 1.28c0 0.448-0.352 0.8-0.8 0.8s-0.8-0.352-0.8-0.8v-3.168c0-0.448 0.352-0.8 0.8-0.8h3.168c0.448 0 0.8 0.352 0.8 0.8s-0.352 0.8-0.8 0.8h-1.28c0.032 0.032 0.224 0.224 0.256 0.256 0.992 0.992 2.304 1.536 3.68 1.536 1.408 0 2.72-0.544 3.68-1.536 0.992-0.992 1.536-2.304 1.536-3.68s-0.544-2.72-1.536-3.68c-0.992-0.992-2.304-1.536-3.68-1.536-1.408 0-2.72 0.544-3.68 1.536l-8.416 8.448c-1.312 1.312-3.072 1.984-4.832 1.984s-3.488-0.672-4.832-1.984c-2.656-2.656-2.656-6.976 0-9.632s6.976-2.656 9.632 0c0.032 0.032 0.16 0.16 0.192 0.192l0.064 0.064v-1.28c0-0.448 0.352-0.8 0.8-0.8s0.8 0.352 0.8 0.8v3.168c0 0.448-0.352 0.8-0.8 0.8h-3.168c-0.448 0-0.8-0.352-0.8-0.8s0.352-0.8 0.8-0.8h1.28l-0.096-0.064c-0.032-0.032-0.16-0.16-0.192-0.192-0.992-0.992-2.304-1.536-3.68-1.536s-2.72 0.544-3.68 1.536c-2.048 2.048-2.048 5.344 0 7.392 0.992 0.992 2.304 1.536 3.68 1.536s2.72-0.544 3.68-1.536l8.512-8.512c1.28-1.28 3.008-1.984 4.832-1.984s3.52 0.704 4.832 1.984c2.624 2.656 2.624 7.008-0.032 9.664z"
+          />
+          <path
+            d="M24.512 23.488c-1.6 0-3.136-0.512-4.416-1.44-0.128 0.704-0.736 1.248-1.44 1.248-0.8 0-1.472-0.672-1.472-1.472v-3.168c0-0.8 0.672-1.472 1.472-1.472h3.168c0.8 0 1.472 0.672 1.472 1.472 0 0.608-0.384 1.152-0.928 1.376 0.64 0.352 1.376 0.544 2.144 0.544 1.216 0 2.368-0.48 3.2-1.344 0.864-0.864 1.344-1.984 1.344-3.2s-0.48-2.368-1.344-3.2c-0.864-0.864-1.984-1.344-3.2-1.344s-2.368 0.48-3.2 1.344l-8.512 8.48c-1.408 1.408-3.296 2.176-5.312 2.176s-3.872-0.768-5.312-2.176c-2.912-2.912-2.912-7.68 0-10.592 1.408-1.408 3.296-2.176 5.312-2.176 0 0 0 0 0 0 1.6 0 3.136 0.512 4.416 1.44 0.128-0.704 0.736-1.248 1.472-1.248 0.8 0 1.472 0.672 1.472 1.472v3.168c0 0.8-0.672 1.472-1.472 1.472h-3.168c-0.8 0-1.472-0.672-1.472-1.472 0-0.608 0.384-1.152 0.928-1.376-0.64-0.352-1.376-0.544-2.144-0.544-1.216 0-2.368 0.48-3.2 1.344-1.76 1.76-1.76 4.64 0 6.432 0.864 0.864 2.016 1.344 3.2 1.344 1.216 0 2.368-0.48 3.2-1.344l8.48-8.544c1.408-1.408 3.296-2.208 5.312-2.208s3.872 0.768 5.312 2.208c1.408 1.408 2.176 3.296 2.176 5.312s-0.768 3.872-2.208 5.312v0c0 0 0 0 0 0-1.408 1.408-3.296 2.176-5.28 2.176zM18.752 18.912l1.44 1.44c1.152 1.152 2.688 1.792 4.32 1.792s3.168-0.64 4.32-1.792v0c1.152-1.152 1.792-2.688 1.792-4.32s-0.64-3.168-1.792-4.32c-1.152-1.152-2.688-1.792-4.352-1.792-1.632 0-3.168 0.64-4.32 1.792l-8.48 8.448c-1.12 1.12-2.592 1.728-4.16 1.728s-3.072-0.608-4.16-1.728c-2.304-2.304-2.304-6.048 0-8.352 1.12-1.12 2.592-1.728 4.16-1.728s3.072 0.608 4.16 1.728l1.44 1.408h-2.912c-0.064 0-0.128 0.064-0.128 0.128s0.064 0.128 0.128 0.128h3.168c0.064 0 0.128-0.064 0.128-0.128v-3.168c0-0.064-0.064-0.128-0.128-0.128s-0.128 0.064-0.128 0.128v2.912l-1.408-1.408c-1.152-1.152-2.688-1.792-4.352-1.792-1.632 0-3.168 0.64-4.32 1.792-2.4 2.4-2.4 6.272 0 8.672 1.152 1.152 2.688 1.792 4.32 1.792s3.168-0.64 4.32-1.792l8.512-8.512c1.12-1.12 2.592-1.728 4.16-1.728s3.072 0.608 4.16 1.728c1.12 1.12 1.728 2.592 1.728 4.16s-0.608 3.072-1.728 4.16c-1.12 1.12-2.592 1.728-4.16 1.728s-3.072-0.608-4.16-1.728l-1.408-1.408h2.912c0.064 0 0.128-0.064 0.128-0.128s-0.064-0.128-0.128-0.128h-3.168c-0.064 0-0.128 0.064-0.128 0.128v3.168c0 0.064 0.064 0.128 0.128 0.128s0.128-0.064 0.128-0.128v-2.88z"
+          />
+        </symbol>
+        <symbol id="icon-pause" viewBox="0 0 32 32">
+          <title>icon-pause</title>
+          <path
+            d="M16 0.32c-8.64 0-15.68 7.040-15.68 15.68s7.040 15.68 15.68 15.68 15.68-7.040 15.68-15.68-7.040-15.68-15.68-15.68zM16 29.216c-7.296 0-13.216-5.92-13.216-13.216s5.92-13.216 13.216-13.216 13.216 5.92 13.216 13.216-5.92 13.216-13.216 13.216z"
+          />
+          <path
+            d="M16 32c-8.832 0-16-7.168-16-16s7.168-16 16-16 16 7.168 16 16-7.168 16-16 16zM16 0.672c-8.448 0-15.328 6.88-15.328 15.328s6.88 15.328 15.328 15.328c8.448 0 15.328-6.88 15.328-15.328s-6.88-15.328-15.328-15.328zM16 29.568c-7.488 0-13.568-6.080-13.568-13.568s6.080-13.568 13.568-13.568c7.488 0 13.568 6.080 13.568 13.568s-6.080 13.568-13.568 13.568zM16 3.104c-7.104 0-12.896 5.792-12.896 12.896s5.792 12.896 12.896 12.896c7.104 0 12.896-5.792 12.896-12.896s-5.792-12.896-12.896-12.896z"
+          />
+          <path
+            d="M12.16 22.336v0c-0.896 0-1.6-0.704-1.6-1.6v-9.472c0-0.896 0.704-1.6 1.6-1.6v0c0.896 0 1.6 0.704 1.6 1.6v9.504c0 0.864-0.704 1.568-1.6 1.568z"
+          />
+          <path
+            d="M19.84 22.336v0c-0.896 0-1.6-0.704-1.6-1.6v-9.472c0-0.896 0.704-1.6 1.6-1.6v0c0.896 0 1.6 0.704 1.6 1.6v9.504c0 0.864-0.704 1.568-1.6 1.568z"
+          />
+        </symbol>
+        <symbol id="icon-play" viewBox="0 0 32 32">
+          <title>icon-play</title>
+          <path
+            d="M21.216 15.168l-7.616-5.088c-0.672-0.416-1.504 0.032-1.504 0.832v10.176c0 0.8 0.896 1.248 1.504 0.832l7.616-5.088c0.576-0.416 0.576-1.248 0-1.664z"
+          />
+          <path
+            d="M13.056 22.4c-0.224 0-0.416-0.064-0.608-0.16-0.448-0.224-0.704-0.672-0.704-1.152v-10.176c0-0.48 0.256-0.928 0.672-1.152s0.928-0.224 1.344 0.064l7.616 5.088c0.384 0.256 0.608 0.672 0.608 1.088s-0.224 0.864-0.608 1.088l-7.616 5.088c-0.192 0.16-0.448 0.224-0.704 0.224zM13.056 10.272c-0.096 0-0.224 0.032-0.32 0.064-0.224 0.128-0.352 0.32-0.352 0.576v10.176c0 0.256 0.128 0.48 0.352 0.576 0.224 0.128 0.448 0.096 0.64-0.032l7.616-5.088c0.192-0.128 0.288-0.32 0.288-0.544s-0.096-0.416-0.288-0.544l-7.584-5.088c-0.096-0.064-0.224-0.096-0.352-0.096z"
+          />
+          <path
+            d="M16 0.32c-8.64 0-15.68 7.040-15.68 15.68s7.040 15.68 15.68 15.68 15.68-7.040 15.68-15.68-7.040-15.68-15.68-15.68zM16 29.216c-7.296 0-13.216-5.92-13.216-13.216s5.92-13.216 13.216-13.216 13.216 5.92 13.216 13.216-5.92 13.216-13.216 13.216z"
+          />
+          <path
+            d="M16 32c-8.832 0-16-7.168-16-16s7.168-16 16-16 16 7.168 16 16-7.168 16-16 16zM16 0.672c-8.448 0-15.328 6.88-15.328 15.328s6.88 15.328 15.328 15.328c8.448 0 15.328-6.88 15.328-15.328s-6.88-15.328-15.328-15.328zM16 29.568c-7.488 0-13.568-6.080-13.568-13.568s6.080-13.568 13.568-13.568c7.488 0 13.568 6.080 13.568 13.568s-6.080 13.568-13.568 13.568zM16 3.104c-7.104 0-12.896 5.792-12.896 12.896s5.792 12.896 12.896 12.896c7.104 0 12.896-5.792 12.896-12.896s-5.792-12.896-12.896-12.896z"
+          />
+        </symbol>
+        <symbol id="icon-link" viewBox="0 0 32 32">
+          <title>link</title>
+          <path
+            d="M23.584 17.92c0 0.864 0 1.728 0 2.56 0 1.312 0 2.656 0 3.968 0 0.352 0.032 0.736-0.032 1.12 0.032-0.16 0.032-0.288 0.064-0.448-0.032 0.224-0.096 0.448-0.16 0.64 0.064-0.128 0.128-0.256 0.16-0.416-0.096 0.192-0.192 0.384-0.32 0.576 0.096-0.128 0.16-0.224 0.256-0.352-0.128 0.16-0.288 0.32-0.48 0.48 0.128-0.096 0.224-0.16 0.352-0.256-0.192 0.128-0.352 0.256-0.576 0.32 0.128-0.064 0.256-0.128 0.416-0.16-0.224 0.096-0.416 0.16-0.64 0.16 0.16-0.032 0.288-0.032 0.448-0.064-0.256 0.032-0.512 0.032-0.768 0.032-0.448 0-0.896 0-1.312 0-1.472 0-2.976 0-4.448 0-1.824 0-3.616 0-5.44 0-1.568 0-3.104 0-4.672 0-0.736 0-1.44 0-2.176 0-0.128 0-0.224 0-0.352-0.032 0.16 0.032 0.288 0.032 0.448 0.064-0.224-0.032-0.448-0.096-0.64-0.16 0.128 0.064 0.256 0.128 0.416 0.16-0.192-0.096-0.384-0.192-0.576-0.32 0.128 0.096 0.224 0.16 0.352 0.256-0.16-0.128-0.32-0.288-0.48-0.48 0.096 0.128 0.16 0.224 0.256 0.352-0.128-0.192-0.256-0.352-0.32-0.576 0.064 0.128 0.128 0.256 0.16 0.416-0.096-0.224-0.16-0.416-0.16-0.64 0.032 0.16 0.032 0.288 0.064 0.448-0.032-0.256-0.032-0.512-0.032-0.768 0-0.448 0-0.896 0-1.312 0-1.472 0-2.976 0-4.448 0-1.824 0-3.616 0-5.44 0-1.568 0-3.104 0-4.672 0-0.736 0-1.44 0-2.176 0-0.128 0-0.224 0.032-0.352-0.032 0.16-0.032 0.288-0.064 0.448 0.032-0.224 0.096-0.448 0.16-0.64-0.064 0.128-0.128 0.256-0.16 0.416 0.096-0.192 0.192-0.384 0.32-0.576-0.096 0.128-0.16 0.224-0.256 0.352 0.128-0.16 0.288-0.32 0.48-0.48-0.128 0.096-0.224 0.16-0.352 0.256 0.192-0.128 0.352-0.256 0.576-0.32-0.128 0.064-0.256 0.128-0.416 0.16 0.224-0.096 0.416-0.16 0.64-0.16-0.16 0.032-0.288 0.032-0.448 0.064 0.48-0.064 0.96-0.032 1.44-0.032 0.992 0 1.952 0 2.944 0 1.216 0 2.432 0 3.616 0 1.056 0 2.112 0 3.168 0 0.512 0 1.024 0 1.536 0 0 0 0 0 0.032 0 0.448 0 0.896-0.192 1.184-0.48s0.512-0.768 0.48-1.184c-0.032-0.448-0.16-0.896-0.48-1.184s-0.736-0.48-1.184-0.48c-0.64 0-1.28 0-1.92 0-1.408 0-2.816 0-4.224 0-1.44 0-2.848 0-4.256 0-0.672 0-1.344 0-2.016 0-0.736 0-1.472 0.192-2.112 0.576s-1.216 0.96-1.568 1.6c-0.384 0.64-0.544 1.376-0.544 2.144 0 0.672 0 1.376 0 2.048 0 1.28 0 2.56 0 3.84 0 1.504 0 3.040 0 4.544 0 1.408 0 2.848 0 4.256 0 0.992 0 1.952 0 2.944 0 0.224 0 0.448 0 0.64 0 0.864 0.224 1.76 0.768 2.464 0.16 0.192 0.288 0.384 0.48 0.576s0.384 0.352 0.608 0.512c0.32 0.224 0.64 0.384 1.024 0.512 0.448 0.16 0.928 0.224 1.408 0.224 0.16 0 0.32 0 0.48 0 0.896 0 1.792 0 2.72 0 1.376 0 2.784 0 4.16 0 1.536 0 3.040 0 4.576 0 1.312 0 2.656 0 3.968 0 0.768 0 1.536 0 2.336 0 0.416 0 0.832-0.032 1.248-0.128 1.504-0.32 2.784-1.6 3.104-3.104 0.128-0.544 0.128-1.056 0.128-1.568 0-0.608 0-1.184 0-1.792 0-1.408 0-2.816 0-4.224 0-0.256 0-0.512 0-0.768 0-0.448-0.192-0.896-0.48-1.184s-0.768-0.512-1.184-0.48c-0.448 0.032-0.896 0.16-1.184 0.48-0.384 0.384-0.576 0.768-0.576 1.248v0z"
+          />
+          <path
+            d="M32 11.232c0-0.8 0-1.568 0-2.368 0-1.248 0-2.528 0-3.776 0-0.288 0-0.576 0-0.864 0-0.896-0.768-1.696-1.696-1.696-0.8 0-1.568 0-2.368 0-1.248 0-2.528 0-3.776 0-0.288 0-0.576 0-0.864 0-0.448 0-0.896 0.192-1.184 0.48s-0.512 0.768-0.48 1.184c0.032 0.448 0.16 0.896 0.48 1.184s0.736 0.48 1.184 0.48c0.8 0 1.568 0 2.368 0 1.248 0 2.528 0 3.776 0 0.288 0 0.576 0 0.864 0-0.576-0.576-1.12-1.12-1.696-1.696 0 0.8 0 1.568 0 2.368 0 1.248 0 2.528 0 3.776 0 0.288 0 0.576 0 0.864 0 0.448 0.192 0.896 0.48 1.184s0.768 0.512 1.184 0.48c0.448-0.032 0.896-0.16 1.184-0.48 0.352-0.256 0.544-0.64 0.544-1.12v0z"
+          />
+          <path
+            d="M15.040 21.888c0.16-0.16 0.288-0.288 0.448-0.448 0.384-0.384 0.8-0.8 1.184-1.184 0.608-0.608 1.184-1.184 1.792-1.792 0.704-0.704 1.44-1.44 2.176-2.176 0.8-0.8 1.568-1.568 2.368-2.368s1.6-1.6 2.4-2.4c0.736-0.736 1.504-1.504 2.24-2.24 0.64-0.64 1.248-1.248 1.888-1.888 0.448-0.448 0.896-0.896 1.344-1.344 0.224-0.224 0.448-0.416 0.64-0.64 0 0 0.032-0.032 0.032-0.032 0.32-0.32 0.48-0.768 0.48-1.184s-0.192-0.896-0.48-1.184c-0.32-0.288-0.736-0.512-1.184-0.48-0.512 0.032-0.928 0.16-1.248 0.48-0.16 0.16-0.288 0.288-0.448 0.448-0.384 0.384-0.8 0.8-1.184 1.184-0.608 0.608-1.184 1.184-1.792 1.792-0.704 0.704-1.44 1.44-2.176 2.176-0.8 0.8-1.568 1.568-2.368 2.368s-1.6 1.6-2.4 2.4c-0.736 0.736-1.504 1.504-2.24 2.24-0.64 0.64-1.248 1.248-1.888 1.888-0.448 0.448-0.896 0.896-1.344 1.344-0.224 0.224-0.448 0.416-0.64 0.64 0 0-0.032 0.032-0.032 0.032-0.32 0.32-0.48 0.768-0.48 1.184s0.192 0.896 0.48 1.184c0.32 0.288 0.736 0.512 1.184 0.48 0.48 0 0.928-0.16 1.248-0.48v0z"
+          />
+        </symbol>
+        <symbol id="icon-next" viewBox="0 0 32 32">
+          <title>next</title>
+          <path
+            d="M2.304 18.304h14.688l-4.608 4.576c-0.864 0.864-0.864 2.336 0 3.232 0.864 0.864 2.336 0.864 3.232 0l8.448-8.48c0.864-0.864 0.864-2.336 0-3.232l-8.448-8.448c-0.448-0.448-1.056-0.672-1.632-0.672s-1.184 0.224-1.632 0.672c-0.864 0.864-0.864 2.336 0 3.232l4.64 4.576h-14.688c-1.248 0-2.304 0.992-2.304 2.272s1.024 2.272 2.304 2.272z"
+          />
+          <path
+            d="M29.696 26.752c1.248 0 2.304-1.024 2.304-2.304v-16.928c0-1.248-1.024-2.304-2.304-2.304s-2.304 1.024-2.304 2.304v16.928c0.064 1.28 1.056 2.304 2.304 2.304z"
+          />
+        </symbol>
+        <symbol id="icon-prev" viewBox="0 0 32 32">
+          <title>prev</title>
+          <path
+            d="M29.696 13.696h-14.688l4.576-4.576c0.864-0.864 0.864-2.336 0-3.232-0.864-0.864-2.336-0.864-3.232 0l-8.448 8.48c-0.864 0.864-0.864 2.336 0 3.232l8.448 8.448c0.448 0.448 1.056 0.672 1.632 0.672s1.184-0.224 1.632-0.672c0.864-0.864 0.864-2.336 0-3.232l-4.608-4.576h14.688c1.248 0 2.304-1.024 2.304-2.304s-1.024-2.24-2.304-2.24z"
+          />
+          <path
+            d="M2.304 5.248c-1.248 0-2.304 1.024-2.304 2.304v16.928c0 1.248 1.024 2.304 2.304 2.304s2.304-1.024 2.304-2.304v-16.928c-0.064-1.28-1.056-2.304-2.304-2.304z"
+          />
+        </symbol>
+      </defs>
+    </svg>
+  </div>
 </template>
 
 <script>
-import Util from '../lib/util'
-import Resource from '../lib/resource'
+import Util from "../lib/util";
+import Resource from "../lib/resource";
+import RhythmService from "../services/rhythm_service";
 export default {
-    props: {
-        resource: {
-            type: Object,
-            default: null,
-        },
-        sets: {
-            type: Array,
-            default: null,
-        },
-        curSet: {
-            type: Object,
-            default: null,
-        },
-        curSong: {
-            type: Object,
-            default: null,
-        },
-
-        autoplay: {
-            type: Boolean,
-            default: false,
-        },
-        playMode: {
-            type: String,
-            default: "loopset",
-        },
-        showMode: {
-            type: String,
-            default: "screen",
-        },
-        muted: {
-            type: Boolean,
-            default: false,
+  props: {
+  },
+  data() {
+    return {
+      audio: null,
+      circleLeft: null,
+      barWidth: null,
+      duration: null,
+      currentTime: null,
+      isTimerPlaying: false,
+      tracks: [],
+      currentTrack: null,
+      currentTrackIndex: 0,
+	  transitionName: null,
+	  isShowCover: false,
+    };
+  },
+  methods: {
+    play() {
+      if (this.audio.paused) {
+        this.audio.play();
+        this.isTimerPlaying = true;
+      } else {
+        this.audio.pause();
+        this.isTimerPlaying = false;
+      }
+    },
+    generateTime() {
+      let width = (100 / this.audio.duration) * this.audio.currentTime;
+      this.barWidth = width + "%";
+      this.circleLeft = width + "%";
+      let durmin = Math.floor(this.audio.duration / 60);
+      let dursec = Math.floor(this.audio.duration - durmin * 60);
+      let curmin = Math.floor(this.audio.currentTime / 60);
+      let cursec = Math.floor(this.audio.currentTime - curmin * 60);
+      if (durmin < 10) {
+        durmin = "0" + durmin;
+      }
+      if (dursec < 10) {
+        dursec = "0" + dursec;
+      }
+      if (curmin < 10) {
+        curmin = "0" + curmin;
+      }
+      if (cursec < 10) {
+        cursec = "0" + cursec;
+      }
+      this.duration = durmin + ":" + dursec;
+      this.currentTime = curmin + ":" + cursec;
+    },
+    updateBar(x) {
+      let progress = this.$refs.progress;
+      let maxduration = this.audio.duration;
+      let position = x - progress.offsetLeft;
+      let percentage = (100 * position) / progress.offsetWidth;
+      if (percentage > 100) {
+        percentage = 100;
+      }
+      if (percentage < 0) {
+        percentage = 0;
+      }
+      this.barWidth = percentage + "%";
+      this.circleLeft = percentage + "%";
+      this.audio.currentTime = (maxduration * percentage) / 100;
+      this.audio.play();
+    },
+    clickProgress(e) {
+      this.isTimerPlaying = true;
+      this.audio.pause();
+      this.updateBar(e.pageX);
+    },
+    prevTrack() {
+      this.transitionName = "scale-in";
+      this.isShowCover = false;
+      if (this.currentTrackIndex > 0) {
+        this.currentTrackIndex--;
+      } else {
+        this.currentTrackIndex = this.tracks.length - 1;
+      }
+      this.currentTrack = this.tracks[this.currentTrackIndex];
+      this.resetPlayer();
+    },
+    nextTrack() {
+      this.transitionName = "scale-out";
+      this.isShowCover = false;
+      if (this.currentTrackIndex < this.tracks.length - 1) {
+        this.currentTrackIndex++;
+      } else {
+        this.currentTrackIndex = 0;
+      }
+      this.currentTrack = this.tracks[this.currentTrackIndex];
+      this.resetPlayer();
+    },
+    resetPlayer() {
+      this.barWidth = 0;
+      this.circleLeft = 0;
+      this.audio.currentTime = 0;
+      this.audio.src = this.currentTrack.source;
+      setTimeout(() => {
+        if (this.isTimerPlaying) {
+          this.audio.play();
+        } else {
+          this.audio.pause();
         }
+      }, 300);
     },
-    data() {
-        return {
-            playedRate: 0,
-            currentTime: "-:--",
-            duration: "-:--",
-            status: "loading",
-            volume: 0.5,
+    favorite() {
+      this.tracks[this.currentTrackIndex].favorited = !this.tracks[
+        this.currentTrackIndex
+      ].favorited;
+	},
+	async formateData() {
+		let sets = await RhythmService.getRhythmSets();
 
-            control: true,
+		if (sets.length > 0) {
+			sets[0].rhythms.forEach(rhythm => {
+				this.tracks.push({
+					name: rhythm.name,
+					artist: rhythm.singer_name,
+					cover: rhythm.avatar,
+					source: rhythm.url,
+					favorited: false
+				});
+			});
+		}
+	},
+  },
 
-            mouseOverControl: false,
-            showSetSong: false,
-            activeSet: null,
-        }
-    },
+  async created() {
+	let vm = this;
+	await vm.formateData();
 
-    methods: {
-        
-        onChangeProgress(e) {
-            var rate = e.offsetX / this.$refs.progress.offsetWidth;
-            this.$refs.audio.currentTime = this.$refs.audio.duration * rate;
-            if (this.$refs.audio.paused) {
-                this.onPlayPause();
-            }
-        },
+    this.currentTrack = this.tracks[0];
+    this.audio = new Audio();
+    this.audio.src = this.currentTrack.source;
+    this.audio.ontimeupdate = function() {
+      vm.generateTime();
+    };
+    this.audio.onloadedmetadata = function() {
+      vm.generateTime();
+    };
+    this.audio.onended = function() {
+      vm.nextTrack();
+      this.isTimerPlaying = true;
+    };
 
-        onPlay(gradual=true) {
-            if (this.$refs.audio.paused) {
-                this.onPlayPause(gradual);
-            }
-        },
-
-        onPause(gradual=true) {
-            if (!this.$refs.audio.paused) {
-                this.onPlayPause(gradual);
-            }
-        },
-
-        onPlayPause(gradual=true) {
-            var audio = this.$refs.audio;
-            if (!audio.src) {
-                return;
-            }
-            if (audio.paused) {
-                document.title = `${this.curSong.name} - ${this.curSong.singer}`;
-                this.autoplay = true;
-                this.$refs.audio.play();
-                this.status = "playing";
-                if (gradual) {
-                    var volume = 0;
-                    var i = this.volume / 8;
-                    var timer = setInterval(() => {
-                        if (volume === this.volume) {
-                            clearInterval(timer);
-                            return;
-                        } else {
-                            volume += i;
-                            if (volume > this.volume) {
-                                volume = this.volume;
-                            }
-                            this.$refs.audio.volume = volume;
-                        }
-                    }, 100);
-                }
-            } else {
-                this.status = "paused";
-                if (gradual) {
-                    var volume = this.volume;
-                    var i = volume / 8;
-                    var timer = setInterval(() => {
-                        if (volume === 0) {
-                            this.$refs.audio.pause();
-                            clearInterval(timer);
-                            return;
-                        } else {
-                            volume -= i;
-                            if (volume < 0) {
-                                volume = 0;
-                            }
-                            this.$refs.audio.volume = volume;
-                        }
-                    }, 100);
-                } else {
-                    this.$refs.audio.pause();
-                }
-            }
-        },
-
-        onForward() {
-            this.changeSong(this.getSong("next"));
-        },
-
-        onPlayMode() {
-            this.playMode = this.getPlayMode();
-        },
-
-        onVolume(e, tap=false) {
-            if (tap) {
-                var audio = this.$refs.audio;
-                if (!audio.src) {
-                    return;
-                }
-                this.muted = !this.muted;
-                if (!this.muted) {
-                    this.$refs.audio.muted = this.muted;
-                    var volume = 0;
-                    var i = this.volume / 8;
-                    var timer = setInterval(() => {
-                        if (volume === this.volume) {
-                            clearInterval(timer);
-                            return;
-                        } else {
-                            volume += i;
-                            if (volume > this.volume) {
-                                volume = this.volume;
-                            }
-                            this.$refs.audio.volume = volume;
-                        }
-                    }, 100);
-                } else {
-                    var volume = this.volume;
-                    var i = volume / 8;
-                    var timer = setInterval(() => {
-                        if (volume === 0) {
-                            this.$refs.audio.muted = this.muted;
-                            clearInterval(timer);
-                            return;
-                        } else {
-                            volume -= i;
-                            if (volume < 0) {
-                                volume = 0;
-                            }
-                            this.$refs.audio.volume = volume;
-                        }
-                    }, 100);
-                }
-                return;
-            }
-
-            console.log(e);
-
-            var rate = e.offsetY / this.$refs.volumeprogress.offsetHeight;
-            this.volume = 1 * rate < 0 ? 0 : 1 * rate;
-            this.$refs.audio.volume = this.volume;
-        },
-
-        onInterval() {
-            var that = this;
-            var timer = setInterval(() => {
-                that.resetSong();
-            }, 500);
-        },
-
-        getPlayMode() {
-            switch (this.playMode) {
-                case "loopset":
-                    return "loopone";
-                case "loopone":
-                    return "random";
-                case "random":
-                    return "loopset";
-            }
-        },
-
-        getSong(type) {
-            switch (this.playMode) {
-                case "loopset":
-                    type = type || "next";
-                    var index = this.curSong.index + (type === "next" ? 1 : (type === "pre" ? -1 : 0));
-                    return index + 1 >= this.curSet.songs.length ? this.curSet.songs[0] : this.curSet.songs[index];
-                case "loopone":
-                    var index = this.curSong.index + (type === "next" ? 1 : (type === "pre" ? -1 : 0));
-                    return index + 1 >= this.curSet.songs.length ? this.curSet.songs[0] : this.curSet.songs[index];
-                case "random":
-                    type = type || "next";
-                    var index = parseInt(Math.random() * this.curSet.songs.length - 1);
-                    return this.curSet.songs[index];
-            }
-        },
-
-        async changeSong(song) {
-            this.onPause(false);
-            this.status = "loading";
-            if (!song.src) {
-                console.log("warn src is", song.src);
-                return;
-            }
-            this.curSong = song;
-            await Util.loadImage(song.avatar);
-            this.resetSong();
-            this.onPlay(false);
-        },
-        
-        resetSong() {
-            this.currentTime = this.$refs.audio.duration ? Util.getFormatedDateTime("m:ss", this.$refs.audio.currentTime) : this.currentTime;
-            this.duration = this.$refs.audio.duration ? Util.getFormatedDateTime("m:ss", this.$refs.audio.duration) : this.duration;
-            this.playedRate = this.$refs.audio.duration ? this.$refs.audio.currentTime / this.$refs.audio.duration * 100 : 0;
-        },
-        onHideControl() {
-            var that = this;
-            that.mouseOverControl = false;
-            setTimeout(() => {
-                if (that.mouseOverControl || that.status == "paused") {
-                    return;
-                }
-                that.control = false;
-            }, 3000);
-        },
-
-        async readyPlay() {
-            if (this.curSong) {
-                return;
-            }
-            if (this.curSet && this.curSet.songs && this.curSet.songs[0]) {
-                this.curSong = this.curSet.songs[0];
-
-                this.activeSet = this.curSet;
-                return;
-            }
-            if (this.sets && this.sets[0] && this.sets[0].songs && this.sets[0].songs[0]) {
-                this.curSet = this.sets[0];
-                this.curSong = this.curSet.songs[0];
-
-                this.activeSet = this.curSet;
-                return;
-            }
-            if (this.resource) {
-                let data = await Resource.get(
-                    this.resource,
-                );
-                this.sets = this.rowFormated(data);
-                if (this.sets && this.sets[0] && this.sets[0].songs && this.sets[0].songs[0]) {
-                    this.curSet = this.sets[0];
-                    this.curSong = this.curSet.songs[0];
-
-                    this.activeSet = this.curSet;
-                    return;
-                }
-            }
-            console.log(this.curSong, this.curSet, this.sets, this.resource);
-            console.warn("snow music player init fail~");
-        },
-
-        rowFormated(data) {
-            var sets = [];
-            var setIndex = 0;
-            data.rhythm_sets.forEach(set => {
-                var songs = [];
-                var songIndex = 0;
-                set.rhythms.forEach(song => {
-                    songs.push({
-                        index: songIndex ++,
-                        avatar: song.avatar,
-                        lyric: song.lyric,
-                        name: song.name,
-                        playedCount: song.played_count,
-                        singer: song.singer_name,
-                        translatedLyric: song.translated_lyric,
-                        src: song.url,
-                    });
-                });
-                sets.push({
-                    index: setIndex ++,
-                    avatar: set.avatar,
-                    name: set.name,
-                    playedCount: set.played_count,
-                    songs: songs,
-                });
-            });
-            return sets;
-        },
-
-        onClickSet(set) {
-            this.activeSet = set;
-        },
-
-        onClickSong(song) {
-            this.changeSong(song);
-            if (this.activeSet.index != this.curSet.index) {
-                this.curSet = this.activeSet;
-            }
-        },
-
-        onClickSetSong() {
-            this.showSetSong = !this.showSetSong;
-        },
-    },
-
-    async beforeMount() {
-        await this.readyPlay();
-    },
-
-    mounted() {
-        document.title = "Snow Music Player";
-
-        var that = this;
-        
-        this.$refs.audio.volume = this.volume;
-        this.$refs.audio.muted = this.muted;
-        this.status = this.autoplay ? "playing" : "paused";
-        this.onInterval();
-        this.onHideControl();
-
-        that.$refs.audio.addEventListener("ended",function(){
-            console.log('ended');
-            that.status = 'paused';
-            that.changeSong(that.getSong());
-        });
+    // this is optional (for preload covers)
+    for (let index = 0; index < this.tracks.length; index++) {
+      const element = this.tracks[index];
+      let link = document.createElement("link");
+      link.rel = "prefetch";
+      link.href = element.cover;
+      link.as = "image";
+      document.head.appendChild(link);
     }
-}
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-    .v-music-background{
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url(http://www.17sucai.com/preview/1424582/2018-10-14/music/earth-space.jpg);
-        background-position: center;
-        background-size: cover;
-        filter: blur(10px);
-        transform: scale(1.1);
-        transition: 0.4s all;
-    }
-    .v-change{
-        filter: blur(20px);
-    }
-    .v-music-screen{
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        flex-direction: column;
-        .v-i-info{
-            right: 0;
-            padding: 1rem;
-            color: #fff;
-            animation: bounce-in-right 1s ease-in;
-            font-family: 'Barlow Condensed', sans-serif;
-            .v-i-song{
-                text-align: right;
-                font-size: 2rem;
-                padding: 0.2rem;
-            }
-            .v-i-singer{
-                text-align: right;
-                font-size: 1.5rem;
-                padding: 0.2rem;
-            }
-        }
-        .v-i-control{
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            height: 50px;
-            color: #fff;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
-            transition: all 0.4s;
-            display: flex;
-            .v-i-button{
-                width: 50px;
-                height: 50px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: 0.4s all;
-            }
-            .v-i-button:active{
-                transform: scale(0.8);
-            }
-            .v-i-playtoggle{
-                .v-i-play, .v-i-pause{
-                    position: absolute;
-                    width: 50px;
-                    height: 50px;
-                    transition: 0.4s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .v-i-loading{
-                    position: absolute;
-                    transition: 0.4s;
-                    animation: trans 2s linear infinite;
-                }
-                .v-i-hide{
-                    opacity: 0;
-                    transform: scale(0.25);
-                }
-            }
-            .v-i-playmodetoggle{
-                .v-i-loopset, .v-i-loopone, .v-i-random{
-                    position: absolute;
-                    width: 50px;
-                    height: 50px;
-                    transition: 0.4s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .v-i-hide{
-                    opacity: 0;
-                    transform: scale(0.25);
-                }
-            }
-            .v-i-volume{
-                width: 50px;
-                height: 50px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: 0.4s all;
-                .v-i-volumetoggle{
-                    position: relative;
-                    .v-i-muted, .v-i-off, .v-i-down, .v-i-up{
-                        position: absolute;
-                        width: 50px;
-                        height: 50px;
-                        transition: 0.4s;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .v-i-hide{
-                        opacity: 0;
-                        transform: scale(0.25);
-                    }
-                }
-                .v-i-volumeback{
-                    position: absolute;
-                    bottom: 100%;
-                    width: 0;
-                    height: 180%;
-                    opacity: 0;
-                    background-color: rgba(255, 255, 255, 0.2);
-                    transition: 0.4s opacity;
-                    transform: rotate(180deg);
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 20px;
-                    .v-i-volumeprogress{
-                        position: relative;
-                        height: 70%;
-                        width: 0;
-                        background: rgba(255, 255, 255, 0.2);
-                        .v-i-fill{
-                            background-color:#c62828;
-                            position: relative;
-                            bottom: 0;
-                            width: 100%;
-                            display: flex;
-                            justify-content: center;
-                            transition: 0.2s all;
-                            .v-i-drager{
-                                opacity: 0;
-                                background-color:#c62828;
-                                position: absolute;
-                                bottom: -8px;
-                                width: 0;
-                                height: 16px;
-                                border-radius: 50%;
-                                transition: 0.4s all;
-                                transform: rotate(180deg);
-                                .v-i-text{
-                                    position: absolute;
-                                    right: -20px;
-                                    display: none;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .v-i-volume:hover{
-                .v-i-volumeback{
-                    width: 24px;
-                    opacity: 1;
-                    .v-i-volumeprogress{
-                        width: 6px;
-                    }
-                }
-                .v-i-volumeback:hover{
-                    width: 24px;
-                    .v-i-fill{
-                        .v-i-drager{
-                            opacity: 0.8;
-                            width: 16px;
-                            .v-i-text{
-                                display: inline;
-                            }
-                        }
-                    }
-                }
-            }
-            .v-i-time{
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-family: 'Barlow Condensed', sans-serif;
-                .v-i-current{
-                    padding: 0 0.5rem;
-                    width: 1.5rem;
-                }
-                .v-i-end{
-                    padding: 0 0.5rem;
-                    width: 1.5rem;
-                }
-            }
-            .v-i-progress{
-                position: absolute;
-                left: 0;
-                bottom: 50px;
-                height: 4px;
-                width: 100%;
-                background-color: rgba(255, 255, 255, 0.2);
-                transition: 0.4s all;
-                cursor: pointer;
-                .v-i-fill{
-                    background-color:#c62828;
-                    position: relative;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    transition: 0.2s all;
-                    .v-i-drager{
-                        opacity: 0;
-                        background-color:#c62828;
-                        position: absolute;
-                        right: -8px;
-                        width: 16px;
-                        height: 16px;
-                        border-radius: 50%;
-                        transition: 0.4s all;
-                    }
-                }
-            }
-            .v-i-progress:hover{
-                height: 6px;
-                .v-i-fill{
-                    .v-i-drager{
-                        opacity: 0.8;
-                    }
-                }
-            }
-        }
-        .v-i-hide{
-            transform: translateY(100%);
-        }
-        .v-i-list{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            color: #fff;
-            opacity: 0.8;
-            transition: 0.4s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .v-i-list:hover{
-            opacity: 1;
-        }
-        .v-i-setsong{
-            position: absolute;
-            width: 500px;
-            height: 50%;
-            background: #eef3f7;
-            display: flex;
-            margin: 0 auto;
-            border-radius: 8px;
-            color: #71829e;
-            font-size: 12px;
-            box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
-            overflow: hidden;
-            transform: scale(1);
-            transition: 0.4s;
-            left: calc(50% - 250px);
-            top: 25%;
-            ::-webkit-scrollbar{
-                width: 5px;
-                height: 5px;
-            }
-            ::-webkit-scrollbar-thumb{
-                opacity: 0.5;
-                border-radius: 10px;
-                background-color:#dedede;
-            }
-            .v-i-sets{
-                width: 160px;
-                overflow-x: hidden;
-                overflow-y: auto;
-                .v-i-set{
-                    display: flex;
-                    align-items: center;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    transition: 0.4s;
-                    &:hover{
-                        opacity: 1;
-                    }
-                    .v-i-icon{
-                        width: 12px;
-                        margin: 0 0 0 12px;
-                    }
-                    .v-i-name{
-                        margin: 8px 12px;
-                        text-align: left;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-                }
-                .v-i-active{
-                    opacity: 1;
-                    background: #dedede;
-                    border-radius: 8px;
-                }
-            }
-            .v-i-songs{
-                width: 80%;
-                overflow-x: hidden;
-                overflow-y: auto;
-                position: relative;
-                .v-i-tip{
-                    margin: 10px;
-                }
-                .v-i-song{
-                    display: flex;
-                    align-items: center;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    transition: 0.4s;
-                    &:hover{
-                        opacity: 1;
-                    }
-                    .v-i-icon{
-                        width: 12px;
-                        margin: 0 0 0 12px;
-                    }
-                    .v-i-name{
-                        width: 150px;
-                        margin: 8px 12px;
-                        text-align: left;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-                    .v-i-singer{
-                        width: 130px;
-                        margin: 8px 12px;
-                        text-align: left;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-                    .v-i-count{
-                        width: 60px;
-                        margin: 8px 12px;
-                        text-align: right;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-                }
-                .v-i-active{
-                    opacity: 1;
-                    background: #dedede;
-                    border-radius: 8px;
-                }
-            }
-        }
-        .v-i-hidesetsong{
-            transform: scale(0);
-            left: -250px;
-            top: -25%;
-        }
-    }
 
-    @keyframes bounce-in-right {
-        0%, 60%, 75%, 90%, 100% {
-            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
+* {
+  box-sizing: border-box;
+}
 
-        0% {
-            opacity: 0;
-            transform: translate3d(3000px, 0, 0);
-        }
-        60% {
-            opacity: 1;
-            transform: translate3d(-25px, 0, 0);
-        }
-        75% {
-            transform: translate3d(10px, 0, 0);
-        }
-        90% {
-            transform: translate3d(-5px, 0, 0);
-        }
-        100% {
-            transform: none;
-        }
-    }
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
 
-    @keyframes trans{
-        from {
-            transform: rotate(0deg);
-        }
-        to {
-            transform: rotate(360deg);
-        }
-    }
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background: #dfe7ef;
+  font-family: "Bitter", serif;
+  pointer-events: none;
+}
+@media screen and (max-width: 700px), (max-height: 500px) {
+  .wrapper {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+}
+
+.player {
+  background: #eef3f7;
+  width: 410px;
+  min-height: 480px;
+  box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
+  border-radius: 15px;
+  padding: 30px;
+  pointer-events:auto;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player {
+    width: 95%;
+    padding: 20px;
+    margin-top: 75px;
+    min-height: initial;
+    padding-bottom: 30px;
+    max-width: 400px;
+  }
+}
+.player__top {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  z-index: 4;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player__top {
+    flex-wrap: wrap;
+  }
+}
+.player-cover {
+  width: 300px;
+  height: 300px;
+  margin-left: -70px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  border-radius: 15px;
+  z-index: 1;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player-cover {
+    margin-top: -70px;
+    margin-bottom: 25px;
+    width: 290px;
+    height: 230px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+.player-cover__item {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.player-cover__item:before {
+  content: "";
+  background: inherit;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0px 10px 40px 0px rgba(76, 70, 124, 0.5);
+  display: block;
+  z-index: 1;
+  position: absolute;
+  top: 30px;
+  transform: scale(0.9);
+  filter: blur(10px);
+  opacity: 0.9;
+  border-radius: 15px;
+}
+.player-cover__item:after {
+  content: "";
+  background: inherit;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0px 10px 40px 0px rgba(76, 70, 124, 0.5);
+  display: block;
+  z-index: 2;
+  position: absolute;
+  border-radius: 15px;
+}
+.player-cover__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0px 10px 40px 0px rgba(76, 70, 124, 0.5);
+  user-select: none;
+  pointer-events: none;
+}
+.player-controls {
+  flex: 1;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player-controls {
+    flex-direction: row;
+    padding-left: 0;
+    width: 100%;
+    flex: unset;
+  }
+}
+.player-controls__item {
+  display: inline-flex;
+  font-size: 30px;
+  padding: 5px;
+  margin-bottom: 10px;
+  color: #acb8cc;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player-controls__item {
+    font-size: 26px;
+    padding: 5px;
+    margin-right: 10px;
+    color: #acb8cc;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0;
+  }
+}
+.player-controls__item::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  transform: scale(0.5);
+  opacity: 0;
+  box-shadow: 0px 5px 10px 0px rgba(76, 70, 124, 0.2);
+  transition: all 0.3s ease-in-out;
+  transition: all 0.4s cubic-bezier(0.35, 0.57, 0.13, 0.88);
+}
+@media screen and (min-width: 500px) {
+  .player-controls__item:hover {
+    color: #532ab9;
+  }
+  .player-controls__item:hover::before {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player-controls__item:active {
+    color: #532ab9;
+  }
+  .player-controls__item:active::before {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+.player-controls__item .icon {
+  position: relative;
+  z-index: 2;
+}
+.player-controls__item.-xl {
+  margin-bottom: 0;
+  font-size: 95px;
+  filter: drop-shadow(0 11px 6px rgba(172, 184, 204, 0.45));
+  color: #fff;
+  width: auto;
+  height: auto;
+  display: inline-flex;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .player-controls__item.-xl {
+    margin-left: auto;
+    font-size: 75px;
+    margin-right: 0;
+  }
+}
+.player-controls__item.-xl:before {
+  display: none;
+}
+.player-controls__item.-favorite.active {
+  color: red;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+[v-cloak] > * {
+  display: none;
+}
+
+.progress {
+  width: 100%;
+  margin-top: -15px;
+  user-select: none;
+  text-align: left;
+}
+.progress__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.progress__duration {
+  color: #71829e;
+  font-weight: 700;
+  font-size: 20px;
+  opacity: 0.5;
+}
+.progress__time {
+  margin-top: 2px;
+  color: #71829e;
+  font-weight: 700;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.progress__bar {
+  height: 6px;
+  width: 100%;
+  cursor: pointer;
+  background-color: #d0d8e6;
+  display: inline-block;
+  border-radius: 10px;
+}
+
+.progress__current {
+  height: inherit;
+  width: 0%;
+  background-color: #a3b3ce;
+  border-radius: 10px;
+}
+
+.album-info {
+  color: #71829e;
+  flex: 1;
+  padding-right: 60px;
+  user-select: none;
+  overflow: hidden;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .album-info {
+    padding-right: 30px;
+  }
+}
+.album-info__name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  line-height: 1.3em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .album-info__name {
+    font-size: 18px;
+    margin-bottom: 9px;
+  }
+}
+.album-info__track {
+  font-weight: 400;
+  font-size: 20px;
+  opacity: 0.7;
+  line-height: 1.3em;
+  min-height: 52px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media screen and (max-width: 576px), (max-height: 500px) {
+  .album-info__track {
+    font-size: 18px;
+    min-height: 50px;
+  }
+}
+.scale-out-enter-active {
+  transition: all 0.35s ease-in-out;
+}
+
+.scale-out-leave-active {
+  transition: all 0.35s ease-in-out;
+}
+
+.scale-out-enter {
+  transform: scale(0.55);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.scale-out-leave-to {
+  transform: scale(1.2);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.scale-in-enter-active {
+  transition: all 0.35s ease-in-out;
+}
+
+.scale-in-leave-active {
+  transition: all 0.35s ease-in-out;
+}
+
+.scale-in-enter {
+  transform: scale(1.2);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.scale-in-leave-to {
+  transform: scale(0.55);
+  pointer-events: none;
+  opacity: 0;
+}
 </style>

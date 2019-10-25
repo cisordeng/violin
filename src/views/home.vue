@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <music-player :resource="resource"></music-player>
+    <music-player></music-player>
     <!-- <audio autoplay="true" loop="true" src="http://music.163.com/song/media/outer/url?id=300136.mp3"></audio> -->
-  </div>
 </template>
 
 <script>
@@ -16,11 +14,6 @@
     },
     data() {
       return {
-        resource: {
-          service: 'nature',
-          resource: 'rhythm.rhythm_sets',
-          data: {},
-        }
       }
     },
     methods: {
