@@ -271,10 +271,10 @@ export default {
       ].favorited;
 	},
 	async formateData() {
-		let sets = await RhythmService.getRhythmSets();
+		let set = await RhythmService.getRhythmSet(33);
 
-		if (sets.length > 0) {
-			sets[0].rhythms.forEach(rhythm => {
+		if (set && set.rhythms.length > 0) {
+			set.rhythms.forEach(rhythm => {
 				this.tracks.push({
 					name: rhythm.name,
 					artist: rhythm.singer_name,
