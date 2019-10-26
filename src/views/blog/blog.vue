@@ -1,0 +1,180 @@
+<template>
+  <div class="v-main">
+      <div class="v-i-header">
+          <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif"/>
+          <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
+      </div>
+      <div class="v-i-main">
+          <div class="v-i-articles">
+              <div 
+                v-for="article in articles"
+                :key="article.name"
+                class="v-i-article"
+              >
+                <div class="v-i-time">
+                  <div class="v-i-month">{{article.created_at.split(' ')[0].split('-')[1]}}月</div>
+                  <div class="v-i-day">{{article.created_at.split(' ')[0].split('-')[2]}}</div>
+                </div>
+                <div class="v-i-title">{{article.title}}</div>
+                <div class="v-i-content">{{article.content}}</div>
+                <div class="v-i-more">
+                    <div class="v-i-text">阅读全文</div>
+                </div>
+              </div>
+          </div>
+          <div class="v-i-paging"></div>
+      </div>
+  </div>
+</template>
+
+<script>
+import Vue from "vue";
+import MusicPlayer from "../../components/music_player";
+// import Resource from '../lib/resource'
+
+export default {
+  components: {
+    "music-player": MusicPlayer
+  },
+  data() {
+    return {
+        articles: [{
+            title: '测试文章范德萨发',
+            content: '范德萨奥奥奥奥过发多过热二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二',
+            author: 'cisor',
+            created_at: '2019-10-20 12:22:00',
+            address: '江苏，南京',
+            tags: ['球的麻袋', 'fdafds'],
+        }, {
+            title: '测试文章范德萨发',
+            content: '范德萨奥奥奥奥过发多过热二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二',
+            author: 'cisor',
+            created_at: '2019-10-20 12:22:00',
+            address: '江苏，南京',
+            tags: ['球的麻袋', 'fdafds'],
+        }, {
+            title: '测试文章范德萨发',
+            content: '范德萨奥奥奥奥过发多过热二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二二',
+            author: 'cisor',
+            created_at: '2019-10-20 12:22:00',
+            address: '江苏，南京',
+            tags: ['球的麻袋', 'fdafds'],
+        }]
+    };
+  },
+  methods: {},
+  mounted() {}
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style lang="scss" scoped>
+.v-main {
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+  .v-i-header{
+      width: 100%;
+      height: 200px;
+      background-color: #6852ED;
+      background-image: linear-gradient(40deg,#9c4dff 0,#42a7ff 100%);
+      background-image: url(https://s2.ax1x.com/2019/10/26/KDyb6g.jpg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      flex-shrink: 0;
+      .v-i-avatar{
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+      }
+      .v-i-slogan{
+          margin: 10px 0;
+          color: #fdd;
+          font-size: 12px;
+      }
+  }
+  .v-i-main{
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      .v-i-articles{
+          width: 650px;
+          box-sizing: border-box;
+          margin: 20px 0;
+          .v-i-article{
+              padding: 20px 30px;
+              margin: 20px 0;
+              height: 120px;
+              background: #ffffff;
+              box-shadow: 0px 0px 3px #ccc;
+              position: relative;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: space-between;
+              .v-i-time{
+                width: 48px;
+                height: 48px;
+                background: #d9534f;
+                border-color: #d43f3a;
+                color: #ffffff;
+                border-radius: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: -15px;
+                left: -10px;
+                .v-i-month{
+                  transform: scale(0.7);
+                  font-size: 12px;
+                  line-height: 8px;
+                }
+                .v-i-day{
+                  font-size: 18px;
+                  font-weight: bold;
+                }
+              }
+              .v-i-title{
+                font-size: 20px;
+                color: #3d4450;
+                cursor: pointer;
+                transition: all 0.3s;
+                &:hover{
+                  color: #d9534f;
+                }
+              }
+              .v-i-content{
+                font-size: 12px;
+              }
+              .v-i-more{
+                cursor: pointer;
+                  background: #d9534f;
+                  color: #ffffff;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  align-self: flex-end;
+                  padding: 5px 8px;
+                  border-radius: 3px;
+                  .v-i-text{
+                    font-size: 12px;
+                  }
+              }
+          }
+      }
+      @media screen and (max-width: 720px), (max-height: 500px) {
+        .v-i-articles {
+          width: 90%;
+        }
+      }
+  }
+}
+</style>

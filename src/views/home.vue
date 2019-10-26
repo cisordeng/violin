@@ -20,28 +20,25 @@ export default {
   },
   data() {
     return {
-      navs: [
-        {
-          name: "Github",
-          href: "https://github.com/cisordeng"
-        },
-        {
-          name: "博客园",
-          href: "https://cnblogs.com/dearvee"
-        },
-        {
-          name: "CSDN",
-          href: "https://blog.csdn.net/dearvee"
-        },
-        {
-          name: "Email",
-          href: "mailto:m@cisor.cn"
-        },
-        {
-          name: "网易云音乐",
-          href: "https://music.163.com/#/user/home?id=347204163"
-        }
-      ]
+      navs: [{
+        name: "博客",
+        href: "/blog"
+      }, {
+        name: "Github",
+        href: "https://github.com/cisordeng"
+      }, {
+        name: "博客园",
+        href: "https://cnblogs.com/dearvee"
+      }, {
+        name: "CSDN",
+        href: "https://blog.csdn.net/dearvee"
+      }, {
+        name: "Email",
+        href: "mailto:m@cisor.cn"
+      }, {
+        name: "网易云音乐",
+        href: "https://music.163.com/#/user/home?id=347204163"
+      }]
     };
   },
   methods: {},
@@ -57,6 +54,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #dfe7ef;
   .v-i-navs {
     padding: 5vw;
     display: flex;
