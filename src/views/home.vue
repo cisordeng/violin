@@ -55,6 +55,7 @@ export default {
   align-items: center;
   justify-content: center;
   background: #dfe7ef;
+  overflow: hidden;
   .v-i-navs {
     padding: 5vw;
     display: flex;
@@ -115,17 +116,19 @@ export default {
       }
     }
   }
-  @media screen and (max-width: 576px), (max-height: 500px) {
+  @media screen and (max-width: 700px), (max-height: 500px) {
     .v-i-navs {
       padding: 1vw;
       width: 410px;
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
   }
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .v-main {
     flex-direction: column;
   }

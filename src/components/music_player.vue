@@ -360,9 +360,9 @@ export default {
   padding: 30px;
   pointer-events:auto;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player {
-    width: 95%;
+    width: 85%;
     padding: 20px;
     margin-top: 75px;
     min-height: initial;
@@ -376,7 +376,7 @@ export default {
   position: relative;
   z-index: 4;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player__top {
     flex-wrap: wrap;
   }
@@ -391,7 +391,7 @@ export default {
   border-radius: 15px;
   z-index: 1;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player-cover {
     margin-top: -70px;
     margin-bottom: 25px;
@@ -454,7 +454,7 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player-controls {
     flex-direction: row;
     padding-left: 0;
@@ -476,7 +476,7 @@ export default {
   position: relative;
   transition: all 0.3s ease-in-out;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player-controls__item {
     font-size: 26px;
     padding: 5px;
@@ -510,7 +510,7 @@ export default {
     transform: scale(1.3);
   }
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player-controls__item:active {
     color: #532ab9;
   }
@@ -532,7 +532,7 @@ export default {
   height: auto;
   display: inline-flex;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .player-controls__item.-xl {
     margin-left: auto;
     font-size: 75px;
@@ -602,7 +602,7 @@ export default {
   user-select: none;
   overflow: hidden;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .album-info {
     padding-right: 30px;
   }
@@ -616,7 +616,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .album-info__name {
     font-size: 18px;
     margin-bottom: 9px;
@@ -632,7 +632,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-@media screen and (max-width: 576px), (max-height: 500px) {
+@media screen and (max-width: 700px), (max-height: 500px) {
   .album-info__track {
     font-size: 18px;
     min-height: 50px;
