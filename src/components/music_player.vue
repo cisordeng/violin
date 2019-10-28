@@ -3,18 +3,29 @@
     <div class="player">
       <div class="player__top">
         <div class="player-cover">
-			<transition-group :name="transitionName">
-            	<div
-					v-for="(track, index) in tracks"
-					:key="track.cover"
-					class="player-cover__item"
-					:style="`background-image: url(${(index == currentTrackIndex || index == (currentTrackIndex - 1 < 0 ? tracks.length - 1 : currentTrackIndex - 1) || index == (currentTrackIndex + 1 > tracks.length - 1 ? 0 : currentTrackIndex + 1)) ? track.cover : ''});`"
-					v-show="index == currentTrackIndex"
-				></div>
-			</transition-group>
+          <transition-group :name="transitionName">
+            <div
+              v-for="(track, index) in tracks"
+              :key="track.cover"
+              class="player-cover__item"
+              :style="`background-image: url(${(index == currentTrackIndex || index == (currentTrackIndex - 1 < 0 ? tracks.length - 1 : currentTrackIndex - 1) || index == (currentTrackIndex + 1 > tracks.length - 1 ? 0 : currentTrackIndex + 1)) ? track.cover : ''});`"
+              v-show="index == currentTrackIndex"
+            ></div>
+          </transition-group>
+          <div class="v-i-bars">
+            <div
+              v-for="bar in spectrumBars"
+              class="v-i-bar"
+              :style="`width: ${100 / spectrumBars.length}%;height: ${bar * spectrumBarSensitivity}px`"
+            ></div>
+          </div>
         </div>
         <div class="player-controls">
-          <div class="player-controls__item -favorite" :class="currentTrack && currentTrack.favorited ? 'active' : ''" @click="favorite">
+          <div
+            class="player-controls__item -favorite"
+            :class="currentTrack && currentTrack.favorited ? 'active' : ''"
+            @click="favorite"
+          >
             <svg class="icon">
               <use xlink:href="#icon-heart-o" />
             </svg>
@@ -56,8 +67,13 @@
       </div>
       <div></div>
     </div>
+    <audio ref="audio" crossorigin="anonymous"></audio>
 
-    <svg style="display: none;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg
+      style="display: none;"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
       <defs>
         <symbol id="icon-heart-o" viewBox="0 0 32 32">
           <title>icon-heart-o</title>
@@ -159,11 +175,9 @@ import Util from "../lib/util";
 import Resource from "../lib/resource";
 import RhythmService from "../services/rhythm_service";
 export default {
-  props: {
-  },
+  props: {},
   data() {
     return {
-      audio: null,
       circleLeft: null,
       barWidth: null,
       duration: null,
@@ -172,28 +186,35 @@ export default {
       tracks: [],
       currentTrack: null,
       currentTrackIndex: 0,
-	  transitionName: null,
-	  isShowCover: false,
+      transitionName: null,
+      isShowCover: false,
+
+      supportAudioContext: false,
+
+      // 2的幂
+      spectrumBars: [],
+      spectrumBarNumber: 32,
+      spectrumBarSensitivity: 0.5,
     };
   },
   methods: {
     play() {
-      if (this.audio.paused) {
-        this.audio.play();
+      if (this.$refs.audio.paused) {
+        this.$refs.audio.play();
         this.isTimerPlaying = true;
       } else {
-        this.audio.pause();
+        this.$refs.audio.pause();
         this.isTimerPlaying = false;
       }
     },
     generateTime() {
-      let width = (100 / this.audio.duration) * this.audio.currentTime;
+      let width = (100 / this.$refs.audio.duration) * this.$refs.audio.currentTime;
       this.barWidth = width + "%";
       this.circleLeft = width + "%";
-      let durmin = Math.floor(this.audio.duration / 60);
-      let dursec = Math.floor(this.audio.duration - durmin * 60);
-      let curmin = Math.floor(this.audio.currentTime / 60);
-      let cursec = Math.floor(this.audio.currentTime - curmin * 60);
+      let durmin = Math.floor(this.$refs.audio.duration / 60);
+      let dursec = Math.floor(this.$refs.audio.duration - durmin * 60);
+      let curmin = Math.floor(this.$refs.audio.currentTime / 60);
+      let cursec = Math.floor(this.$refs.audio.currentTime - curmin * 60);
       if (durmin < 10) {
         durmin = "0" + durmin;
       }
@@ -211,7 +232,7 @@ export default {
     },
     updateBar(x) {
       let progress = this.$refs.progress;
-      let maxduration = this.audio.duration;
+      let maxduration = this.$refs.audio.duration;
       let position = x - progress.offsetLeft;
       let percentage = (100 * position) / progress.offsetWidth;
       if (percentage > 100) {
@@ -222,12 +243,12 @@ export default {
       }
       this.barWidth = percentage + "%";
       this.circleLeft = percentage + "%";
-      this.audio.currentTime = (maxduration * percentage) / 100;
-      this.audio.play();
+      this.$refs.audio.currentTime = (maxduration * percentage) / 100;
+      this.$refs.audio.play();
     },
     clickProgress(e) {
       this.isTimerPlaying = true;
-      this.audio.pause();
+      this.$refs.audio.pause();
       this.updateBar(e.pageX);
     },
     prevTrack() {
@@ -255,13 +276,13 @@ export default {
     resetPlayer() {
       this.barWidth = 0;
       this.circleLeft = 0;
-      this.audio.currentTime = 0;
-      this.audio.src = this.currentTrack.source;
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.src = this.currentTrack.source;
       setTimeout(() => {
         if (this.isTimerPlaying) {
-          this.audio.play();
+          this.$refs.audio.play();
         } else {
-          this.audio.pause();
+          this.$refs.audio.pause();
         }
       }, 300);
     },
@@ -269,41 +290,82 @@ export default {
       this.tracks[this.currentTrackIndex].favorited = !this.tracks[
         this.currentTrackIndex
       ].favorited;
-	},
-	async formateData() {
-		let set = await RhythmService.getRhythmSet(36);
+    },
+    async formateData() {
+      let set = await RhythmService.getRhythmSet(33);
 
-		if (set && set.rhythms.length > 0) {
-			set.rhythms.forEach(rhythm => {
-				this.tracks.push({
-					name: rhythm.name,
-					artist: rhythm.singer_name,
-					cover: rhythm.avatar,
-					source: rhythm.url,
-					favorited: false
-				});
-			});
-		}
-	},
+      if (set && set.rhythms.length > 0) {
+        set.rhythms.forEach(rhythm => {
+          this.tracks.push({
+            name: rhythm.name,
+            artist: rhythm.singer_name,
+            cover: rhythm.avatar,
+            source: rhythm.url,
+            favorited: false
+          });
+        });
+      }
+    },
+
+    loadSpectrum() {
+      var vm = this;
+      if (!window.AudioContext) {
+        console.log("您的浏览器不支持AudioContext");
+      } else {
+        var atx = new AudioContext();
+        // this.$refs.audio.crossOrigin = "anonymous";
+
+        var request = new XMLHttpRequest();
+        request.open("GET", this.$refs.audio.src, true);
+        request.responseType = "arraybuffer";
+        request.send();
+        request.onload = () => {
+          atx.decodeAudioData(request.response).then(buffer => {
+            var analyser = atx.createAnalyser();
+            var source = atx.createMediaElementSource(this.$refs.audio);
+            source.connect(analyser);
+            analyser.connect(atx.destination);
+            source.buffer = buffer;
+            var drawMeter = function() {
+              var array = new Uint8Array(analyser.frequencyBinCount);
+              analyser.getByteFrequencyData(array);
+              array = array.slice(0, -256)
+              var step = array.length / vm.spectrumBarNumber;
+              for (var i = 0; i < vm.spectrumBarNumber; i++) {
+                if (vm.spectrumBars.length < vm.spectrumBarNumber) {
+                  vm.spectrumBars.push(array[parseInt(step * i + step / 2 - 1)]);
+                } else {
+                  vm.spectrumBars[i] = array[parseInt(step * i + step / 2 - 1)];
+                }
+              }
+              vm.$forceUpdate()
+              requestAnimationFrame(drawMeter);
+            };
+            requestAnimationFrame(drawMeter);
+          });
+        }
+      };
+    },
   },
 
   async created() {
-	let vm = this;
-	await vm.formateData();
+    let vm = this;
+    await vm.formateData();
 
     this.currentTrack = this.tracks[0];
-    this.audio = new Audio();
-    this.audio.src = this.currentTrack.source;
-    this.audio.ontimeupdate = function() {
+    this.$refs.audio.src = this.currentTrack.source;
+    this.$refs.audio.ontimeupdate = function() {
       vm.generateTime();
     };
-    this.audio.onloadedmetadata = function() {
+    this.$refs.audio.onloadedmetadata = function() {
       vm.generateTime();
     };
-    this.audio.onended = function() {
+    this.$refs.audio.onended = function() {
       vm.nextTrack();
       this.isTimerPlaying = true;
     };
+
+    this.loadSpectrum();
 
     // this is optional (for preload covers)
     // for (let index = 0; index < this.tracks.length; index++) {
@@ -319,7 +381,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 * {
   box-sizing: border-box;
 }
@@ -358,7 +419,7 @@ export default {
   box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
   border-radius: 15px;
   padding: 30px;
-  pointer-events:auto;
+  pointer-events: auto;
 }
 @media screen and (max-width: 700px), (max-height: 500px) {
   .player {
@@ -390,6 +451,23 @@ export default {
   z-index: 2;
   border-radius: 15px;
   z-index: 1;
+  .v-i-bars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    z-index: 3;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    .v-i-bar {
+      border-radius: 3px 3px 0 0;
+      background: #acb8cc;
+      opacity: 0.7;
+      filter: blur(3px);
+    }
+  }
 }
 @media screen and (max-width: 700px), (max-height: 500px) {
   .player-cover {
