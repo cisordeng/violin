@@ -292,7 +292,7 @@ export default {
       ].favorited;
     },
     async formateData() {
-      let set = await RhythmService.getRhythmSet(33);
+      let set = await RhythmService.getRhythmSet(36);
 
       if (set && set.rhythms.length > 0) {
         set.rhythms.forEach(rhythm => {
@@ -326,6 +326,7 @@ export default {
             source.connect(analyser);
             analyser.connect(atx.destination);
             source.buffer = buffer;
+            atx.resume();
             var drawMeter = function() {
               var array = new Uint8Array(analyser.frequencyBinCount);
               analyser.getByteFrequencyData(array);
