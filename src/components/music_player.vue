@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper" @click="() => { this.loadSpectrum(); }">
+  <div class="wrapper" @click="() => { if (!this.onceClicked) { this.loadSpectrum();} this.onceClicked = true; }">
     <div class="player">
       <div class="player__top">
         <div class="player-cover">
@@ -189,7 +189,7 @@ export default {
       transitionName: null,
       isShowCover: false,
 
-      supportAudioContext: false,
+      onceClicked: false,
 
       // 2的幂
       spectrumBars: [],
