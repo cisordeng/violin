@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" @click="() => { this.loadSpectrum(); }">
     <div class="player">
       <div class="player__top">
         <div class="player-cover">
@@ -365,8 +365,6 @@ export default {
       vm.nextTrack();
       this.isTimerPlaying = true;
     };
-
-    this.loadSpectrum();
 
     // this is optional (for preload covers)
     // for (let index = 0; index < this.tracks.length; index++) {
