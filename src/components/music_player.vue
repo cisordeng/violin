@@ -292,17 +292,19 @@ export default {
       ].favorited;
     },
     async formateData() {
-      let set = await RhythmService.getRhythmSet(31);
+      let set = await RhythmService.getRhythmSet(36);
 
       if (set && set.rhythms.length > 0) {
         set.rhythms.forEach(rhythm => {
-          this.tracks.push({
-            name: rhythm.name,
-            artist: rhythm.singer_name,
-            cover: rhythm.avatar,
-            source: rhythm.url,
-            favorited: false
-          });
+          if (rhythm.url != "") {
+            this.tracks.push({
+              name: rhythm.name,
+              artist: rhythm.singer_name,
+              cover: rhythm.avatar,
+              source: rhythm.url,
+              favorited: false
+            });
+          }
         });
       }
     },
