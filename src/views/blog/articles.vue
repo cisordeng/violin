@@ -8,10 +8,11 @@
       <div class="v-i-articles">
         <div v-for="article in articles" :key="article.name" class="v-i-article">
           <div class="v-i-time">
+            <div class="v-i-year">{{article.created_at.split(' ')[0].split('-')[0]}}</div>
             <div class="v-i-month">{{article.created_at.split(' ')[0].split('-')[1]}}月</div>
             <div class="v-i-day">{{article.created_at.split(' ')[0].split('-')[2]}}</div>
           </div>
-          <div class="v-i-title">{{article.title}}</div>
+          <router-link class="v-i-title" :to="{ path: `/blog/article/`, query: { id: article.id } }">{{article.title}}</router-link>
           <div class="v-i-content">{{article.content}}</div>
           <div class="v-i-more">
             <div class="v-i-text">阅读全文</div>
@@ -95,6 +96,13 @@ export default {
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
+        &:hover {
+          .v-i-time {
+            .v-i-year {
+              opacity: 1;
+            }
+          }
+        }
         .v-i-time {
           width: 48px;
           height: 48px;
@@ -109,6 +117,16 @@ export default {
           position: absolute;
           top: -15px;
           left: -10px;
+          .v-i-year {
+            position: absolute;
+            right: -100%;
+            font-size: 12px;
+            border-radius: 3px;
+            padding: 0px 3px;
+            color: #3d4450;
+            opacity: 0;
+            transition: 1s;
+          }
           .v-i-month {
             transform: scale(0.7);
             font-size: 12px;
