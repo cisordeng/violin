@@ -137,6 +137,7 @@ export default {
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 2;
           height: 36px;
+          line-height: 18px;
         }
         .v-i-more {
           cursor: pointer;

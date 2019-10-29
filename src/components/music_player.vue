@@ -292,7 +292,7 @@ export default {
       ].favorited;
     },
     async formateData() {
-      let set = await RhythmService.getRhythmSet(36);
+      let set = await RhythmService.getRhythmSet(31);
 
       if (set && set.rhythms.length > 0) {
         set.rhythms.forEach(rhythm => {
