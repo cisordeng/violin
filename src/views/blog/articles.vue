@@ -120,8 +120,12 @@ export default {
           }
         }
         .v-i-title {
+          width: 100%;
           font-size: 20px;
           color: #3d4450;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
           cursor: pointer;
           transition: all 0.3s;
           &:hover {
