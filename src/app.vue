@@ -1,13 +1,26 @@
 <template>
   <div id="app">
-    <!-- <img src="./assets/images/logo.png"> -->
+    <music-player></music-player>
+    <top></top>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import MusicPlayer from "components/music_player";
+import Top from "components/top";
 export default {
   name: 'App',
+  components: {
+    "music-player": MusicPlayer,
+    "top": Top,
+  },
+  data() {
+    return {
+    }
+  },
+  methods: {
+  },
   mounted() {
   },
 }

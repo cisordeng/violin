@@ -1,5 +1,9 @@
 <template>
-  <div class="wrapper" @click="() => { if (!this.onceClicked) { this.loadSpectrum();} this.onceClicked = true; }">
+  <div
+    class="wrapper"
+    :class="(showPlayer ? '' : 'v-i-hide') + (fixed ? ' v-i-fixed' : '')"
+    @click="() => { if (!this.onceClicked) { this.loadSpectrum();} this.onceClicked = true; }"
+  >
     <div class="player">
       <div class="player__top">
         <div class="player-cover">
@@ -68,6 +72,16 @@
       <div></div>
     </div>
     <audio ref="audio" crossorigin="anonymous"></audio>
+    <div
+      v-if="showCtrl"
+      class="v-i-music"
+      :class="isTimerPlaying ? 'v-i-active' : ''"
+      @click="onClickCtrl"
+    >
+      <svg class="icon">
+        <use xlink:href="#icon-music" />
+      </svg>
+    </div>
 
     <svg
       style="display: none;"
@@ -165,6 +179,13 @@
             d="M2.304 5.248c-1.248 0-2.304 1.024-2.304 2.304v16.928c0 1.248 1.024 2.304 2.304 2.304s2.304-1.024 2.304-2.304v-16.928c-0.064-1.28-1.056-2.304-2.304-2.304z"
           />
         </symbol>
+
+        <symbol id="icon-music" viewBox="0 0 1024 1024">
+          <title>music</title>
+          <path
+            d="M768.496 359.12L648.224 572a128 128 0 1 1-1.648-92.288l90.784-160.656A295.2 295.2 0 0 0 520 224C356.512 224 224 356.512 224 520S356.512 816 520 816C683.472 816 816 683.472 816 520c0-59.328-17.44-114.56-47.504-160.88zM600.272 562.352l-0.272-0.144 1.648-2.912a80 80 0 1 0-1.376 3.072zM864 520C864 709.984 709.984 864 520 864S176 709.984 176 520 330.016 176 520 176 864 330.016 864 520z"
+          />
+        </symbol>
       </defs>
     </svg>
   </div>
@@ -175,7 +196,20 @@ import Util from "../lib/util";
 import Resource from "../lib/resource";
 import RhythmService from "../services/rhythm_service";
 export default {
-  props: {},
+  props: {
+    showCtrl: {
+      type: Boolean,
+      default: true
+    },
+    showPlayer: {
+      type: Boolean,
+      default: false
+    },
+    fixed: {
+      type: Boolean,
+      default: true
+    }
+  },
   data() {
     return {
       circleLeft: null,
@@ -191,10 +225,9 @@ export default {
 
       onceClicked: false,
 
-      // 2的幂
       spectrumBars: [],
       spectrumBarNumber: 32,
-      spectrumBarSensitivity: 0.5,
+      spectrumBarSensitivity: 0.8
     };
   },
   methods: {
@@ -208,7 +241,8 @@ export default {
       }
     },
     generateTime() {
-      let width = (100 / this.$refs.audio.duration) * this.$refs.audio.currentTime;
+      let width =
+        (100 / this.$refs.audio.duration) * this.$refs.audio.currentTime;
       this.barWidth = width + "%";
       this.circleLeft = width + "%";
       let durmin = Math.floor(this.$refs.audio.duration / 60);
@@ -291,8 +325,11 @@ export default {
         this.currentTrackIndex
       ].favorited;
     },
+    onClickCtrl() {
+      this.showPlayer = !this.showPlayer;
+    },
     async formateData() {
-      let set = await RhythmService.getRhythmSet(36);
+      let set = await RhythmService.getRhythmSet(35);
 
       if (set && set.rhythms.length > 0) {
         set.rhythms.forEach(rhythm => {
@@ -332,23 +369,25 @@ export default {
             var drawMeter = function() {
               var array = new Uint8Array(analyser.frequencyBinCount);
               analyser.getByteFrequencyData(array);
-              array = array.slice(0, -256)
+              array = array.slice(0, -256);
               var step = array.length / vm.spectrumBarNumber;
               for (var i = 0; i < vm.spectrumBarNumber; i++) {
                 if (vm.spectrumBars.length < vm.spectrumBarNumber) {
-                  vm.spectrumBars.push(array[parseInt(step * i + step / 2 - 1)]);
+                  vm.spectrumBars.push(
+                    array[parseInt(step * i + step / 2 - 1)]
+                  );
                 } else {
                   vm.spectrumBars[i] = array[parseInt(step * i + step / 2 - 1)];
                 }
               }
-              vm.$forceUpdate()
+              vm.$forceUpdate();
               requestAnimationFrame(drawMeter);
             };
             requestAnimationFrame(drawMeter);
           });
-        }
-      };
-    },
+        };
+      }
+    }
   },
 
   async created() {
@@ -377,6 +416,14 @@ export default {
     //   link.as = "image";
     //   document.head.appendChild(link);
     // }
+  },
+  mounted() {
+    if (!this.showPlayer) {
+      this.showPlayer = true;
+      setTimeout(() => {
+        this.showPlayer = false;
+      }, 2000);
+    }
   }
 };
 </script>
@@ -402,9 +449,20 @@ export default {
   align-items: center;
   justify-content: center;
   background-size: cover;
-  background: #dfe7ef;
+  // background: #dfe7ef;
   font-family: "Bitter", serif;
   pointer-events: none;
+  margin: 0 0 0 50px;
+}
+.v-i-fixed {
+  position: fixed;
+  z-index: 9;
+  left: 0;
+  transition: 0.3s;
+  height: 100%;
+}
+.v-i-hide {
+  left: -460px;
 }
 @media screen and (max-width: 700px), (max-height: 500px) {
   .wrapper {
@@ -413,13 +471,30 @@ export default {
   }
 }
 
+@media screen and (max-width: 700px), (max-height: 500px) {
+  .v-i-fixed {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: initial;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 700px), (max-height: 500px) {
+  .v-i-hide {
+    top: calc(-532px);
+  }
+}
+
 .player {
   background: #eef3f7;
   width: 410px;
   min-height: 480px;
-  box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
+  box-shadow: 0px -5px 35px 15px rgba(50,88,130,0.32);
   border-radius: 15px;
   padding: 30px;
+  z-index: 8;
   pointer-events: auto;
 }
 @media screen and (max-width: 700px), (max-height: 500px) {
@@ -464,7 +539,7 @@ export default {
     justify-content: center;
     .v-i-bar {
       border-radius: 3px 3px 0 0;
-      background: #acb8cc;
+      background: #532ab9;
       opacity: 0.7;
       filter: blur(3px);
     }
@@ -717,6 +792,41 @@ export default {
     min-height: 50px;
   }
 }
+
+.v-i-music {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  background: #fff;
+  margin: 0 0 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 50px;
+  box-shadow: 0px -5px 35px 15px rgba(50,88,130,0.32);
+  cursor: pointer;
+  pointer-events: auto;
+  color: #532ab9;
+  transform: scale(1);
+  transition: 0.3s;
+  &.v-i-active {
+    transform: scale(1.2);
+    color: #532ab9;
+    animation: trans 5s linear infinite;
+  }
+  &:hover {
+    transform: scale(1.2) rotate(360deg);
+    color: #532ab9;
+  }
+}
+
+@media screen and (max-width: 700px), (max-height: 500px) {
+  .v-i-music {
+    margin: 50px 0 0 0;
+  }
+}
+
 .scale-out-enter-active {
   transition: all 0.35s ease-in-out;
 }
@@ -755,5 +865,14 @@ export default {
   transform: scale(0.55);
   pointer-events: none;
   opacity: 0;
+}
+
+@keyframes trans {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
 }
 </style>
