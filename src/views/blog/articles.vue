@@ -14,9 +14,9 @@
           </div>
           <router-link class="v-i-title" :to="{ path: `/blog/article/`, query: { id: article.id } }">{{article.title}}</router-link>
           <div class="v-i-content">{{article.content}}</div>
-          <div class="v-i-more">
+          <router-link class="v-i-more" :to="{ path: `/blog/article/`, query: { id: article.id } }">
             <div class="v-i-text">阅读全文</div>
-          </div>
+          </router-link>
         </div>
       </div>
       <div class="v-i-paging"></div>
@@ -141,6 +141,8 @@ export default {
           width: 100%;
           font-size: 20px;
           color: #3d4450;
+          text-align: center;
+          text-decoration: none;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -165,6 +167,7 @@ export default {
           cursor: pointer;
           background: #d9534f;
           color: #ffffff;
+          text-decoration: none;
           display: flex;
           align-items: center;
           justify-content: center;
