@@ -38,16 +38,17 @@ const router = new VueRouter({
   routes: routes,
 });
 
-router.beforeEach((to, from, next) => {
-  // ...
+router.afterEach((to, from) => {
   from.meta.scrollTop = document.querySelector("#app").scrollTop;
-  console.log(from.meta);
-  if (to.meta.keepAlive && to.meta.scrollTop) {
+  if (to.meta.keepAlive) {
+    var height = 0;
+    if (to.path === '/') {
+      height = document.querySelector("#app").offsetHeight;
+    }
     setTimeout(() => {
-      document.querySelector("#app").scrollTop = to.meta.scrollTop;
+      document.querySelector("#app").scrollTop = (to.meta && to.meta.scrollTop + height) || height;
     }, 1)
   }
-  next()
 })
 
 export default router;
