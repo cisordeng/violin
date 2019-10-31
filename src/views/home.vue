@@ -2,7 +2,7 @@
   <div class="v-main">
     <!-- <music-player class="v-i-player"></music-player> -->
     <div class="v-i-header v-i-home" :class="showHome ? '' : 'v-i-hide'">
-      <img class="v-i-avatar" src="https://wx4.sinaimg.cn/large/005MYnXZgy1g8gk099n9vg305e05edzh.gif" />
+      <img class="v-i-avatar" src="https://wx4.sinaimg.cn/mw690/005MYnXZgy1g8gk099n9vg305e05edzh.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
       <div class="v-i-navs">
         <div v-for="nav in navs" :key="nav.name" class="v-i-nav">
@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="v-i-header">
-      <img class="v-i-avatar" src="https://wx4.sinaimg.cn/large/005MYnXZgy1g8gk099n9vg305e05edzh.gif" />
+      <img class="v-i-avatar" src="https://wx4.sinaimg.cn/mw690/005MYnXZgy1g8gk099n9vg305e05edzh.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
     </div>
     <div class="v-i-main">

@@ -7,10 +7,22 @@ const Article = r => require(['views/article/article'], r);
 const rootPath = '';
 
 // 页面路由
-const routes = [
-  {path: '/', component: Home},
-  {path: '/home', redirect: {path: '/'}},
-  {path: '/article', component: Article},
+const routes = [{
+  path: '/home',
+  redirect: {path: '/'},
+  }, {
+    path: '/',
+    component: Home,
+    meta: {
+      keepAlive: true,
+    },
+  }, {
+    path: '/article',
+    component: Article,
+    // meta: {
+    //   keepAlive: true,
+    // },
+  },
 ].map(route => {
   route.path = rootPath + route.path;
   return route;
