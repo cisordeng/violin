@@ -1,7 +1,7 @@
 <template>
   <div class="v-main">
     <!-- <music-player class="v-i-player"></music-player> -->
-    <div class="v-i-header v-i-home" :class="showHome ? '' : 'v-i-hide'">
+    <!-- <div class="v-i-header v-i-home" :class="showHome ? '' : 'v-i-hide'">
       <img class="v-i-avatar" src="https://wx4.sinaimg.cn/mw690/005MYnXZgy1g8gk099n9vg305e05edzh.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
       <div class="v-i-navs">
@@ -9,12 +9,12 @@
           <a :href="nav.href" :target="nav.name">{{nav.name}}</a>
         </div>
       </div>
-      <div class="v-i-down" @click="() => { this.showHome = false; }">
+      <div class="v-i-down" @click="() => { this.showHome = false;}">
         <svg class="icon">
           <use xlink:href="#icon-down" />
         </svg>
       </div>
-    </div>
+    </div> -->
     <div class="v-i-header">
       <img class="v-i-avatar" src="https://wx4.sinaimg.cn/mw690/005MYnXZgy1g8gk099n9vg305e05edzh.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
@@ -85,12 +85,26 @@ export default {
       articles: [],
     };
   },
+
   methods: {
+    scrollToTop() {
+      var scrollTop = document.querySelector("#app").scrollTop;
+      if (this.showHome && scrollTop > 1) {
+        this.showHome = false;
+        sessionStorage.setItem("showedHome",true)
+      }
+      if (!this.showHome && scrollTop < 1) {
+        this.showHome = true;
+      }
+    }
   },
   async mounted() {
+    document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
+
     this.articles = await ArticleService.getArticles();
   },
   destroyed() {
+    document.querySelector("#app").removeEventListener("scroll", this.scrollToTop);
   },
 };
 </script>
@@ -126,7 +140,7 @@ export default {
     flex-direction: column;
     flex-shrink: 0;
     position: relative;
-    transition: 0.3s all;
+    transition: 0.5s all;
     .v-i-avatar {
       width: 60px;
       height: 60px;
@@ -150,10 +164,12 @@ export default {
       }
     }
     &.v-i-home{
+      opacity: 1;
       height: 100vh;
     }
     &.v-i-hide{
-      height: 0px;
+      opacity: 0.5;
+      height: 1px;
     }
   }
 

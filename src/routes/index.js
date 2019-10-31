@@ -31,4 +31,23 @@ const routes = [{
 // 404 页
 routes.push({path: '*', component: NotFound, name: 'notfound'});
 
-export default routes;
+
+// 创建一个路由对象用于管理页面的路由
+const router = new VueRouter({
+  mode: 'history',
+  routes: routes,
+});
+
+router.beforeEach((to, from, next) => {
+  // ...
+  from.meta.scrollTop = document.querySelector("#app").scrollTop;
+  console.log(from.meta);
+  if (to.meta.keepAlive && to.meta.scrollTop) {
+    setTimeout(() => {
+      document.querySelector("#app").scrollTop = to.meta.scrollTop;
+    }, 1)
+  }
+  next()
+})
+
+export default router;

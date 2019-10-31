@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <music-player></music-player>
-    <top></top>
+    <music-player ref="player"></music-player>
+    <top ref="top"></top>
     <keep-alive>
         <router-view v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>

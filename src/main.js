@@ -5,7 +5,7 @@
 // import VueRouter from 'vue-router'
 // import VueResource from 'vue-resource'
 import App from './app'
-import routes from './routes'
+import router from './routes'
 import storeOption from './vuex/store'
 
 // Vue.use(Vuex);
@@ -13,12 +13,6 @@ import storeOption from './vuex/store'
 // Vue.use(VueResource);
 
 Vue.config.silent = true;
-
-// 创建一个路由对象用于管理页面的路由
-const router = new VueRouter({
-  mode: 'history',
-  routes: routes
-});
 
 // 创建一个 store 对象用于管理应用状态
 const store = new Vuex.Store(storeOption);
