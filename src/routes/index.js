@@ -42,7 +42,7 @@ router.afterEach((to, from) => {
   from.meta.scrollTop = document.querySelector("#app").scrollTop;
   if (to.meta.keepAlive) {
     var height = 0;
-    if (to.path === '/') {
+    if (from.path != '/' && to.path === '/') {
       height = document.querySelector("#app").offsetHeight;
     }
     setTimeout(() => {
