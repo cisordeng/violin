@@ -8,8 +8,8 @@ const rootPath = '';
 
 // 页面路由
 const routes = [{
-  path: '/home',
-  redirect: {path: '/'},
+    path: '/home',
+    redirect: {path: '/'},
   }, {
     path: '/',
     component: Home,

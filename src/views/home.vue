@@ -1,6 +1,6 @@
 <template>
   <div class="v-main">
-    <!-- <music-player class="v-i-player"></music-player> -->
+    <!-- <div v-title :data-title="title"></div> -->
     <div class="v-i-header v-i-home" :class="showHome ? '' : 'v-i-hide'">
       <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
@@ -18,6 +18,11 @@
     <div class="v-i-header">
       <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
+      <div class="v-i-innernavs">
+        <div v-for="nav in innerNavs" :key="nav.name" class="v-i-nav">
+          <router-link :to="nav.href">{{nav.name}}</router-link>
+        </div>
+      </div>
     </div>
     <div class="v-i-main">
       <div class="v-i-articles">
@@ -82,6 +87,22 @@ export default {
         name: "网易云音乐",
         href: "https://music.163.com/#/user/home?id=347204163"
       }],
+      innerNavs: [{
+        name: "笔记",
+        href: "/"
+      }, {
+        name: "动态",
+        href: "/friends"
+      }, {
+        name: "留言",
+        href: "/message"
+      }, {
+        name: "时间轴",
+        href: "/time"
+      }, {
+        name: "关于",
+        href: "/about"
+      }],
       articles: [],
     };
   },
@@ -99,6 +120,7 @@ export default {
     }
   },
   async mounted() {
+    document.title = "首页";
     document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
 
     this.articles = await ArticleService.getArticles();
@@ -139,6 +161,7 @@ export default {
     justify-content: center;
     flex-direction: column;
     flex-shrink: 0;
+    text-shadow: -5px 5px 0 rgba(0,0,0,0.1);
     position: relative;
     transition: 0.5s all;
     .v-i-avatar {
@@ -149,7 +172,7 @@ export default {
     .v-i-slogan {
       margin: 10px 0;
       color: #fdd;
-      font-size: 12px;
+      font-size: 15px;
     }
     .v-i-down {
       position: absolute;
@@ -246,6 +269,69 @@ export default {
     }
   }
 
+  .v-i-innernavs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-family: "Bitter", serif;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    .v-i-nav {
+      transition: 0.3s;
+      font-size: 12px;
+      margin: 0 20px 20px;
+      a {
+        text-decoration: none;
+        color: #d0d8e6;
+        font-weight: inherit;
+        position: relative;
+        &:hover{
+          color: #fff;
+        }
+        &:before {
+          content: ">";
+          width: 15px;
+          height: 100%;
+          line-height: 100%;
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: 0.3s;
+          top: 0;
+          left: -30px;
+          opacity: 0;
+        }
+        &:after {
+          content: "<";
+          width: 15px;
+          height: 100%;
+          line-height: 100%;
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: 0.3s;
+          top: 0;
+          right: -30px;
+          opacity: 0;
+        }
+        &:hover:before {
+          left: -20px;
+          opacity: 1;
+          font-weight: bold;
+        }
+        &:hover:after {
+          right: -20px;
+          opacity: 1;
+          font-weight: bold;
+        }
+      }
+    }
+  }
 
   .v-i-main {
     width: 100%;

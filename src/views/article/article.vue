@@ -32,6 +32,8 @@ export default {
     let id = this.$router.currentRoute.query.id;
     this.article = await ArticleService.getArticle(id);
     this.article.markedContent = markdown.toHTML(this.article.content);
+
+    document.title = this.article.title;
   }
 };
 </script>
@@ -56,10 +58,11 @@ export default {
     flex-direction: column;
     flex-shrink: 0;
     position: relative;
+    text-shadow: -5px 5px 0 rgba(0,0,0,0.1);
     .v-i-title {
       margin: 10px 0;
       color: #fdd;
-      font-size: 18px;
+      font-size: 28px;
     }
     .v-i-time {
       margin: 10px;

@@ -329,7 +329,7 @@ export default {
       this.showPlayer = !this.showPlayer;
     },
     async formateData() {
-      let set = await RhythmService.getRhythmSet(35);
+      let set = await RhythmService.getRhythmSet(16);
 
       if (set && set.rhythms.length > 0) {
         set.rhythms.forEach(rhythm => {

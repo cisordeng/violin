@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <music-player ref="player"></music-player>
-    <top ref="top"></top>
+    <music-player></music-player>
+    <top></top>
     <keep-alive>
         <router-view v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>
@@ -49,5 +49,6 @@ html, body {
   /* text-align: center; */
   color: #2c3e50;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 </style>
