@@ -15,6 +15,7 @@ const routes = [{
     path: '/',
     component: About,
     meta: {
+      title: '关于',
       isNav: true,
     }
   }, {
