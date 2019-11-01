@@ -50,7 +50,7 @@ export default {
       document.querySelector('#app').scrollTop = this.pecent * canScrollTop;
       
     },
-    scrollToTop() {
+    scroll() {
       var scrollTop = document.querySelector("#app").scrollTop;
       var canScrollTop =
         document.querySelector("#app").scrollHeight -
@@ -59,12 +59,12 @@ export default {
     }
   },
   mounted() {
-    document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
+    document.querySelector("#app").addEventListener("scroll", this.scroll);
   },
   destroyed() {
     document
       .querySelector("#app")
-      .removeEventListener("scroll", this.scrollToTop);
+      .removeEventListener("scroll", this.scroll);
   }
 };
 </script>

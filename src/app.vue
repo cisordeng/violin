@@ -4,9 +4,13 @@
     <top></top>
     <navs></navs>
     <keep-alive>
+      <transition :name="transitionName">
         <router-view v-if="$route.meta.keepAlive"></router-view>
+      </transition>
     </keep-alive>
-    <router-view v-if="!$route.meta.keepAlive"></router-view>
+    <transition :name="transitionName">
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
+    </transition>
   </div>
 </template>
 
@@ -23,6 +27,17 @@ export default {
   },
   data() {
     return {
+      transitionName:''
+    }
+  },
+  watch: {//使用watch 监听$router的变化
+    $route(to, from) {
+      console.log('xxx')
+      if( to.meta.index < from.meta.index){
+        this.transitionName = 'slide-right';
+      }else{
+        this.transitionName = 'slide-left';
+      }
     }
   },
   methods: {
@@ -54,5 +69,28 @@ html, body {
   background: #f0f0f0;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.slide-right-enter-active,
+.slide-right-leave-active,
+.slide-left-enter-active,
+.slide-left-leave-active {
+    will-change: transform;
+    transition: all .3s;
+    position: absolute;
+    width:100%;
+    left:0;
+}
+.slide-right-enter {
+    transform: translateX(-100%);
+}
+.slide-right-leave-active {
+    transform: translateX(100%);
+}
+.slide-left-enter {
+    transform: translateX(100%);
+}
+.slide-left-leave-active {
+    transform: translateX(-100%);
 }
 </style>

@@ -56,7 +56,7 @@ export default {
       hover: false,
       navs: [{
         name: "article",
-        href: "/",
+        href: "/articles",
         title: "笔记",
       }, {
         name: "friends",
@@ -72,7 +72,7 @@ export default {
         title: "时间轴",
       }, {
         name: "about",
-        href: "/about",
+        href: "/",
         title: "关于",
       }],
     };
@@ -98,6 +98,7 @@ export default {
   position: fixed;
   bottom: 150px;
   right: 30px;
+  z-index: 999;
   .v-i-navs {
     display: flex;
     align-items: center;
@@ -144,7 +145,6 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 999;
         cursor: pointer;
         text-decoration: none;
         border: none;

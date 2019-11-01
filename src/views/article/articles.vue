@@ -1,24 +1,9 @@
 <template>
   <div class="v-main">
-    <!-- <div v-title :data-title="title"></div> -->
-    <div class="v-i-header v-i-home" :class="showHome ? '' : 'v-i-hide'">
+    <!-- <div class="v-i-header">
       <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
-      <div class="v-i-navs">
-        <div v-for="nav in navs" :key="nav.name" class="v-i-nav">
-          <a :href="nav.href" :target="nav.name">{{nav.name}}</a>
-        </div>
-      </div>
-      <div class="v-i-down" @click="() => { showHome = false;}">
-        <svg class="icon">
-          <use xlink:href="#icon-down" />
-        </svg>
-      </div>
-    </div>
-    <div class="v-i-header">
-      <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
-      <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
-    </div>
+    </div> -->
     <div class="v-i-main">
       <div class="v-i-articles">
         <div v-for="article in articles" :key="article.name" class="v-i-article">
@@ -56,8 +41,8 @@
 
 <script>
 import Vue from "vue";
-import MusicPlayer from "../components/music_player";
-import ArticleService from "../services/article_service";
+import MusicPlayer from "../../components/music_player";
+import ArticleService from "../../services/article_service";
 
 export default {
   components: {
@@ -87,15 +72,10 @@ export default {
   },
 
   methods: {
+    onClickDown() {
+      document.querySelector("#app").scrollTop = document.querySelector("#app").offsetHeight;
+    },
     scrollToTop() {
-      var scrollTop = document.querySelector("#app").scrollTop;
-      if (this.showHome && scrollTop > 1) {
-        this.showHome = false;
-        sessionStorage.setItem("showedHome",true)
-      }
-      if (!this.showHome && scrollTop < 1) {
-        this.showHome = true;
-      }
     }
   },
   async mounted() {
@@ -167,10 +147,6 @@ export default {
     &.v-i-home{
       opacity: 1;
       height: 100vh;
-    }
-    &.v-i-hide{
-      opacity: 0.5;
-      height: 1px;
     }
   }
 
