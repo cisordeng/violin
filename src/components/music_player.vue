@@ -823,7 +823,8 @@ export default {
 
 @media screen and (max-width: 700px), (max-height: 500px) {
   .v-i-music {
-    margin: 50px 0 0 0;
+    align-self: flex-end;
+    margin: 40px 30px 0 0;
   }
 }
 

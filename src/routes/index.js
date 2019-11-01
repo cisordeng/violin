@@ -1,8 +1,11 @@
+import { nextTick } from "q";
+
 const NotFound = r => require(['views/notfound'], r);
 
 const About = r => require(['views/about/about'], r);
 const Articles = r => require(['views/article/articles'], r);
 const Article = r => require(['views/article/article'], r);
+const EditArticle = r => require(['views/article/edit_article'], r);
 
 // 根目录
 const rootPath = '';
@@ -29,6 +32,12 @@ const routes = [{
   }, {
     path: '/article',
     component: Article,
+  }, {
+    path: '/edit_article',
+    component: EditArticle,
+    meta: {
+      keepAlive: true,
+    },
   },
 ].map((route, index) => {
   route.path = rootPath + route.path;
@@ -49,6 +58,21 @@ const router = new VueRouter({
   routes: routes,
 });
 
+
+NProgress.configure({     
+  easing: 'ease',  // 动画方式    
+  speed: 500,  // 递增进度条的速度    
+  showSpinner: true, // 是否显示加载ico    
+  trickleSpeed: 200, // 自动递增间隔    
+  minimum: 0.3, // 初始化时的最小百分比
+})
+
+router.beforeEach((to, from, next) => {
+  NProgress.start();
+
+  next();
+})
+
 router.afterEach((to, from) => {
   if (to.meta && to.meta.title) {
     document.title = to.meta.title;
@@ -58,8 +82,10 @@ router.afterEach((to, from) => {
   if (to.meta && to.meta.keepAlive && to.meta.scrollTop) {
     setTimeout(() => {
       document.querySelector("#app").scrollTop = to.meta.scrollTop;
-    }, 1)
+    }, 500)
   }
+
+  NProgress.done();
 })
 
 export default router;

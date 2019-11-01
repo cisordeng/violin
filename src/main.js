@@ -12,6 +12,10 @@ import storeOption from './vuex/store'
 // Vue.use(VueRouter);
 // Vue.use(VueResource);
 
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+Vue.use(mavonEditor)
+
 Vue.config.silent = true;
 
 // 创建一个 store 对象用于管理应用状态
