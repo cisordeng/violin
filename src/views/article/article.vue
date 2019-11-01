@@ -29,7 +29,7 @@ export default {
   },
   methods: {},
   async mounted() {
-    let id = this.$router.currentRoute.query.id;
+    let id = this.$route.query.id;
     this.article = await ArticleService.getArticle(id);
     this.article.markedContent = markdown.toHTML(this.article.content);
 
@@ -62,7 +62,7 @@ export default {
     .v-i-title {
       margin: 10px 0;
       color: #fdd;
-      font-size: 28px;
+      font-size: 18px;
     }
     .v-i-time {
       margin: 10px;

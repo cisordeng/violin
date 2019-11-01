@@ -2,6 +2,7 @@
   <div id="app">
     <music-player></music-player>
     <top></top>
+    <navs></navs>
     <keep-alive>
         <router-view v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>
@@ -12,11 +13,13 @@
 <script>
 import MusicPlayer from "components/music_player";
 import Top from "components/top";
+import Navs from "components/navs";
 export default {
   name: 'App',
   components: {
     "music-player": MusicPlayer,
     "top": Top,
+    "navs": Navs,
   },
   data() {
     return {
@@ -48,6 +51,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   /* text-align: center; */
   color: #2c3e50;
+  background: #f0f0f0;
   overflow-y: scroll;
   overflow-x: hidden;
 }

@@ -9,7 +9,7 @@
           <a :href="nav.href" :target="nav.name">{{nav.name}}</a>
         </div>
       </div>
-      <div class="v-i-down" @click="() => { this.showHome = false;}">
+      <div class="v-i-down" @click="() => { showHome = false;}">
         <svg class="icon">
           <use xlink:href="#icon-down" />
         </svg>
@@ -18,11 +18,6 @@
     <div class="v-i-header">
       <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
-      <div class="v-i-innernavs">
-        <div v-for="nav in innerNavs" :key="nav.name" class="v-i-nav">
-          <router-link :to="nav.href">{{nav.name}}</router-link>
-        </div>
-      </div>
     </div>
     <div class="v-i-main">
       <div class="v-i-articles">
@@ -87,22 +82,6 @@ export default {
         name: "网易云音乐",
         href: "https://music.163.com/#/user/home?id=347204163"
       }],
-      innerNavs: [{
-        name: "笔记",
-        href: "/"
-      }, {
-        name: "动态",
-        href: "/friends"
-      }, {
-        name: "留言",
-        href: "/message"
-      }, {
-        name: "时间轴",
-        href: "/time"
-      }, {
-        name: "关于",
-        href: "/about"
-      }],
       articles: [],
     };
   },
@@ -120,7 +99,6 @@ export default {
     }
   },
   async mounted() {
-    document.title = "首页";
     document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
 
     this.articles = await ArticleService.getArticles();
@@ -266,70 +244,6 @@ export default {
       justify-content: center;
       padding: 0 10px;
       box-sizing: border-box;
-    }
-  }
-
-  .v-i-innernavs {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    font-family: "Bitter", serif;
-    text-align: center;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    .v-i-nav {
-      transition: 0.3s;
-      font-size: 12px;
-      margin: 0 20px 20px;
-      a {
-        text-decoration: none;
-        color: #d0d8e6;
-        font-weight: inherit;
-        position: relative;
-        &:hover{
-          color: #fff;
-        }
-        &:before {
-          content: ">";
-          width: 15px;
-          height: 100%;
-          line-height: 100%;
-          position: absolute;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: 0.3s;
-          top: 0;
-          left: -30px;
-          opacity: 0;
-        }
-        &:after {
-          content: "<";
-          width: 15px;
-          height: 100%;
-          line-height: 100%;
-          position: absolute;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: 0.3s;
-          top: 0;
-          right: -30px;
-          opacity: 0;
-        }
-        &:hover:before {
-          left: -20px;
-          opacity: 1;
-          font-weight: bold;
-        }
-        &:hover:after {
-          right: -20px;
-          opacity: 1;
-          font-weight: bold;
-        }
-      }
     }
   }
 

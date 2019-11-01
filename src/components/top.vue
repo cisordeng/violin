@@ -84,6 +84,7 @@ export default {
   transition: 0.5s all;
   &.v-i-hide {
     opacity: 0;
+    pointer-events: none;
   }
   .v-i-up {
     font-size: 20px;

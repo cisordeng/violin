@@ -15,6 +15,8 @@ const routes = [{
     component: Home,
     meta: {
       keepAlive: true,
+      title: '首页',
+      isNav: true,
     },
   }, {
     path: '/article',
@@ -39,6 +41,10 @@ const router = new VueRouter({
 });
 
 router.afterEach((to, from) => {
+  if (to.meta && to.meta.title) {
+    document.title = to.meta.title;
+  }
+
   from.meta.scrollTop = document.querySelector("#app").scrollTop;
   if (to.meta.keepAlive) {
     var height = 0;
