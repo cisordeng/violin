@@ -16,6 +16,24 @@ import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 Vue.use(mavonEditor)
 
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  highlight: function (code, lang) {
+        if (lang && hljs.getLanguage(lang)) {    
+          return hljs.highlight(lang, code, true).value;
+        } else {
+          return hljs.highlightAuto(code).value;
+        }
+    }
+});
+
 Vue.config.silent = true;
 
 // 创建一个 store 对象用于管理应用状态

@@ -44,11 +44,13 @@ export default {
       article: {}
     };
   },
-  methods: {},
+  methods: {
+  },
   async mounted() {
     let id = this.$route.query.id;
     this.article = await ArticleService.getArticle(id);
-    this.article.markedContent = markdown.toHTML(this.article.content);
+
+    this.article.markedContent = marked(this.article.content);
 
     document.title = this.article.title;
   }

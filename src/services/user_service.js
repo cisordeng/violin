@@ -1,12 +1,12 @@
 import Resource from '../lib/resource'
 import Service from './service'
 
-class ArticleService extends Service {
+class UserService extends Service {
 	constructor() {
 		super();
     }
 
-    async getArticles() {
+    async getUsers() {
         var data = await Resource.get({
             service: 'nature',
             resource: 'article.articles',
@@ -15,7 +15,7 @@ class ArticleService extends Service {
         return data.articles;
     }
 
-    async getArticle(id) {
+    async getUser(id) {
         var data = await Resource.get({
             service: 'nature',
             resource: 'article.article',
@@ -26,7 +26,7 @@ class ArticleService extends Service {
         return data;
     }
 
-    async newArticle(title, content) {
+    async newUser(title, content) {
         var data = await Resource.put({
             service: 'nature',
             resource: 'article.article',
@@ -38,7 +38,7 @@ class ArticleService extends Service {
         return data;
     }
 
-    async updateArticle(id, title, content) {
+    async updateUser(id, title, content) {
         var data = await Resource.post({
             service: 'nature',
             resource: 'article.article',
@@ -52,6 +52,6 @@ class ArticleService extends Service {
     }
 }
 
-let service = new ArticleService();
+let service = new UserService();
 
 export default service;

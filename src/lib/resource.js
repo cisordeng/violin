@@ -35,6 +35,7 @@ let Resource = {
         }
 
         return new Promise((resolve, reject) => {
+            Vue.http.options.emulateJSON = true;
             Vue.http[options.method.toLocaleLowerCase()](url, data).then(resp =>{
                 if (resp.data.code === 200) {
                     resolve(resp.data.data);
