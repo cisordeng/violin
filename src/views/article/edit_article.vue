@@ -7,7 +7,7 @@
         <use xlink:href="#icon-post" />
       </svg>
     </div>
-    <login :show.sync="showLoginWindow" v-on:success="loginSuccess"></login>
+    <login :show.sync="showLoginWindow" v-on:exit="loginSuccess"></login>
 
     <svg
       style="display: none;"
