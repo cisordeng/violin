@@ -6,49 +6,27 @@ class UserService extends Service {
 		super();
     }
 
-    async getUsers() {
-        var data = await Resource.get({
-            service: 'nature',
-            resource: 'article.articles',
-            data: {}
-        })
-        return data.articles;
-    }
-
-    async getUser(id) {
-        var data = await Resource.get({
-            service: 'nature',
-            resource: 'article.article',
-            data: {
-                id: id,
-            }
-        })
-        return data;
-    }
-
-    async newUser(title, content) {
+    async loginUser(name, password) {
         var data = await Resource.put({
             service: 'nature',
-            resource: 'article.article',
+            resource: 'account.login_user',
             data: {
-                title: title,
-                content: content,
+                name: name,
+                password: password,
             }
         })
+        if (data) {
+            localStorage.setItem('sid', data["sid"]);
+        }
         return data;
     }
 
-    async updateUser(id, title, content) {
-        var data = await Resource.post({
-            service: 'nature',
-            resource: 'article.article',
-            data: {
-                id: id,
-                title: title,
-                content: content,
-            }
-        })
-        return data;
+    isLogined() {
+        if (localStorage.getItem('sid')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

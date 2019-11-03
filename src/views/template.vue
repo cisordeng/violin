@@ -1,6 +1,5 @@
 <template>
-  <div class="v-main">
-  </div>
+  <div class="v-main"></div>
 </template>
 
 <script>
@@ -13,8 +12,7 @@ export default {
     "music-player": MusicPlayer
   },
   data() {
-    return {
-    };
+    return {};
   },
   methods: {},
   mounted() {}

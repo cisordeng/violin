@@ -47,8 +47,7 @@ export default {
         document.querySelector("#app").scrollHeight -
         document.querySelector("#app").offsetHeight;
       this.pecent = e.offsetY / e.target.offsetHeight;
-      document.querySelector('#app').scrollTop = this.pecent * canScrollTop;
-      
+      document.querySelector("#app").scrollTop = this.pecent * canScrollTop;
     },
     scroll() {
       var scrollTop = document.querySelector("#app").scrollTop;
@@ -62,9 +61,7 @@ export default {
     document.querySelector("#app").addEventListener("scroll", this.scroll);
   },
   destroyed() {
-    document
-      .querySelector("#app")
-      .removeEventListener("scroll", this.scroll);
+    document.querySelector("#app").removeEventListener("scroll", this.scroll);
   }
 };
 </script>

@@ -491,7 +491,7 @@ export default {
   background: #eef3f7;
   width: 410px;
   min-height: 480px;
-  box-shadow: 0px -5px 35px 15px rgba(50,88,130,0.32);
+  box-shadow: 0px -5px 35px 15px rgba(50, 88, 130, 0.32);
   border-radius: 15px;
   padding: 30px;
   z-index: 8;
@@ -804,7 +804,7 @@ export default {
   justify-content: center;
   position: relative;
   font-size: 50px;
-  box-shadow: 0 5px 10px 0 rgba(76,70,124,.2);
+  box-shadow: 0 5px 10px 0 rgba(76, 70, 124, 0.2);
   cursor: pointer;
   pointer-events: auto;
   color: #532ab9;

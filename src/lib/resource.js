@@ -6,7 +6,7 @@ let DEFAULT_PARAMS = {}
 let Resource = {
     API_SERVER: API_SERVER,
 
-    query (options) {
+    query(options) {
         let service = options.service;
         let resource = options.resource.replace(/\./g, '/');
         let data = options.data;
@@ -14,8 +14,13 @@ let Resource = {
 
         let url = `${API_SERVER}/${service}/${resource}/`;
 
+        let sid = localStorage.getItem('sid');
+        if (sid) {
+            data['token'] = sid;
+        }
+
         let timestamp = (new Date()).getTime().toString();
-        data['timestamp'] = timestamp.slice(0,10);
+        data['timestamp'] = timestamp.slice(0, 10);
         let sortedKeys = Object.keys(data).sort();
         let sortedParamsList = [];
         for (let i in sortedKeys) {
@@ -36,7 +41,7 @@ let Resource = {
 
         return new Promise((resolve, reject) => {
             Vue.http.options.emulateJSON = true;
-            Vue.http[options.method.toLocaleLowerCase()](url, data).then(resp =>{
+            Vue.http[options.method.toLocaleLowerCase()](url, data).then(resp => {
                 if (resp.data.code === 200) {
                     resolve(resp.data.data);
                 } else {
@@ -44,26 +49,26 @@ let Resource = {
                 }
             }, resp => {
                 reject(resp.data);
-            });  
+            });
         })
     },
 
-    get (options) {
+    get(options) {
         options.method = 'GET'
         return this.query(options)
     },
 
-    put (options) {
+    put(options) {
         options.method = 'PUT'
         return this.query(options)
     },
 
-    post (options) {
+    post(options) {
         options.method = 'POST'
         return this.query(options)
     },
 
-    delete (options) {
+    delete(options) {
         options.method = 'DELETE'
         return this.query(options)
     }

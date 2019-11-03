@@ -23,7 +23,11 @@
       <defs>
         <symbol id="icon-down" viewBox="0 0 1024 1024">
           <title>icon-down</title>
-          <path d="M830.24 340.688l11.328 11.312a16 16 0 0 1 0 22.624L530.448 685.76a16 16 0 0 1-22.64 0L196.688 374.624a16 16 0 0 1 0-22.624l11.312-11.312a16 16 0 0 1 22.624 0l288.496 288.496 288.512-288.496a16 16 0 0 1 22.624 0z" p-id="3459" fill="#f0f0f0"></path>
+          <path
+            d="M830.24 340.688l11.328 11.312a16 16 0 0 1 0 22.624L530.448 685.76a16 16 0 0 1-22.64 0L196.688 374.624a16 16 0 0 1 0-22.624l11.312-11.312a16 16 0 0 1 22.624 0l288.496 288.496 288.512-288.496a16 16 0 0 1 22.624 0z"
+            p-id="3459"
+            fill="#f0f0f0"
+          />
         </symbol>
       </defs>
     </svg>
@@ -42,32 +46,39 @@ export default {
   data() {
     return {
       showHome: true,
-      navs: [{
-        name: "Github",
-        href: "https://github.com/cisordeng"
-      }, {
-        name: "博客园",
-        href: "https://cnblogs.com/dearvee"
-      }, {
-        name: "CSDN",
-        href: "https://blog.csdn.net/dearvee"
-      }, {
-        name: "Email",
-        href: "mailto:m@cisor.cn"
-      }, {
-        name: "网易云音乐",
-        href: "https://music.163.com/#/user/home?id=347204163"
-      }],
-      articles: [],
+      navs: [
+        {
+          name: "Github",
+          href: "https://github.com/cisordeng"
+        },
+        {
+          name: "博客园",
+          href: "https://cnblogs.com/dearvee"
+        },
+        {
+          name: "CSDN",
+          href: "https://blog.csdn.net/dearvee"
+        },
+        {
+          name: "Email",
+          href: "mailto:m@cisor.cn"
+        },
+        {
+          name: "网易云音乐",
+          href: "https://music.163.com/#/user/home?id=347204163"
+        }
+      ],
+      articles: []
     };
   },
 
   methods: {
     onClickDown() {
-      document.querySelector("#app").scrollTop = document.querySelector("#app").offsetHeight;
+      document.querySelector("#app").scrollTop = document.querySelector(
+        "#app"
+      ).offsetHeight;
     },
-    scrollToTop() {
-    }
+    scrollToTop() {}
   },
   async mounted() {
     document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
@@ -75,8 +86,10 @@ export default {
     this.articles = await ArticleService.getArticles();
   },
   destroyed() {
-    document.querySelector("#app").removeEventListener("scroll", this.scrollToTop);
-  },
+    document
+      .querySelector("#app")
+      .removeEventListener("scroll", this.scrollToTop);
+  }
 };
 </script>
 
@@ -91,8 +104,9 @@ export default {
   fill: currentColor;
 }
 .v-main {
-  // width: 100%;
-  // height: 100%;
+  width: 100%;
+  height: 100%;
+  position: fixed;
   background: #f0f0f0;
   // overflow-y: scroll;
   display: flex;
@@ -110,7 +124,7 @@ export default {
     justify-content: center;
     flex-direction: column;
     flex-shrink: 0;
-    text-shadow: -5px 5px 0 rgba(0,0,0,0.1);
+    text-shadow: -5px 5px 0 rgba(0, 0, 0, 0.1);
     position: relative;
     transition: 0.5s all;
     .v-i-avatar {
@@ -135,7 +149,7 @@ export default {
         filter: drop-shadow(0px 0px 10px #fff);
       }
     }
-    &.v-i-home{
+    &.v-i-home {
       opacity: 1;
       height: 100vh;
     }
@@ -158,7 +172,7 @@ export default {
         color: #d0d8e6;
         font-weight: inherit;
         position: relative;
-        &:hover{
+        &:hover {
           color: #fff;
         }
         &:before {
@@ -332,7 +346,7 @@ export default {
     }
     100% {
       transform: scale(1.2);
-    }    
+    }
   }
 }
 </style>
