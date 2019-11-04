@@ -2,17 +2,20 @@ import Resource from '../lib/resource'
 import Service from './service'
 
 class ArticleService extends Service {
-	constructor() {
-		super();
+    constructor() {
+        super();
     }
 
-    async getArticles() {
+    async getArticles(page=1, count_per_page=10) {
         var data = await Resource.get({
             service: 'nature',
             resource: 'article.articles',
-            data: {}
+            data: {
+                page: page,
+                count_per_page: count_per_page,
+            }
         })
-        return data.articles;
+        return data;
     }
 
     async getArticle(id) {

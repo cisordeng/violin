@@ -1,6 +1,5 @@
 <template>
   <div class="v-main">
-    <!-- <div v-title :data-title="title"></div> -->
     <div class="v-i-header v-i-home">
       <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
@@ -45,7 +44,6 @@ export default {
   },
   data() {
     return {
-      showHome: true,
       navs: [
         {
           name: "Github",
@@ -68,28 +66,13 @@ export default {
           href: "https://music.163.com/#/user/home?id=347204163"
         }
       ],
-      articles: []
     };
   },
 
   methods: {
-    onClickDown() {
-      document.querySelector("#app").scrollTop = document.querySelector(
-        "#app"
-      ).offsetHeight;
-    },
-    scrollToTop() {}
   },
-  async mounted() {
-    document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
-
-    this.articles = await ArticleService.getArticles();
+  mounted() {
   },
-  destroyed() {
-    document
-      .querySelector("#app")
-      .removeEventListener("scroll", this.scrollToTop);
-  }
 };
 </script>
 

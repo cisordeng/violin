@@ -26,8 +26,8 @@
             <div class="v-i-text">阅读全文</div>
           </router-link>
         </div>
-        <div class="v-i-paging"></div>
       </div>
+      <page :pageInfo.sync="pageInfo" v-on:changePage="onChangePage"></page>
     </div>
     <svg
       style="display: none;"
@@ -47,61 +47,40 @@
 </template>
 
 <script>
-// import Vue from "vue";
-import MusicPlayer from "../../components/music_player";
+import Page from "../../components/page";
 import ArticleService from "../../services/article_service";
 
 export default {
   components: {
-    "music-player": MusicPlayer
+    page: Page
   },
   data() {
     return {
-      showHome: true,
-      navs: [
-        {
-          name: "Github",
-          href: "https://github.com/cisordeng"
-        },
-        {
-          name: "博客园",
-          href: "https://cnblogs.com/dearvee"
-        },
-        {
-          name: "CSDN",
-          href: "https://blog.csdn.net/dearvee"
-        },
-        {
-          name: "Email",
-          href: "mailto:m@cisor.cn"
-        },
-        {
-          name: "网易云音乐",
-          href: "https://music.163.com/#/user/home?id=347204163"
-        }
-      ],
-      articles: []
+      articles: [],
+      pageInfo: {}
     };
   },
 
   methods: {
-    onClickDown() {
-      document.querySelector("#app").scrollTop = document.querySelector(
-        "#app"
-      ).offsetHeight;
+    async onChangePage (action) {
+      switch (action) {
+        case "prev":
+          await this.loadArticles(this.pageInfo.prev);
+          break;
+        case "next":
+          await this.loadArticles(this.pageInfo.next);
+          break;
+      }
     },
-    scrollToTop() {}
+    async loadArticles(page=1) {
+      let data = await ArticleService.getArticles(page);
+      this.articles = data.articles;
+      this.pageInfo = data.page_info;
+    },
   },
   async mounted() {
-    document.querySelector("#app").addEventListener("scroll", this.scrollToTop);
-
-    this.articles = await ArticleService.getArticles();
+    await this.loadArticles();
   },
-  destroyed() {
-    document
-      .querySelector("#app")
-      .removeEventListener("scroll", this.scrollToTop);
-  }
 };
 </script>
 
@@ -156,11 +135,13 @@ export default {
   .v-i-main {
     width: 100%;
     display: flex;
+    align-items: center;
     justify-content: center;
+    flex-direction: column;
+    margin: 20px 0;
     .v-i-articles {
       width: 650px;
       box-sizing: border-box;
-      margin: 20px 0;
       .v-i-article {
         padding: 20px 30px;
         margin: 20px 0;
