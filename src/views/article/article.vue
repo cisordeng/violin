@@ -91,6 +91,9 @@ export default {
       margin: 10px 0;
       color: #fdd;
       font-size: 18px;
+      width: 60%;
+      word-break: break-word;
+      text-align: center;
     }
     .v-i-time {
       margin: 10px;

@@ -213,12 +213,14 @@ export default {
           }
         }
         .v-i-title {
-          width: 100%;
+          width: 80%;
           font-size: 20px;
           color: #3d4450;
           text-align: center;
           text-decoration: none;
           white-space: nowrap;
+          word-break: break-word;
+          text-align: center;
           overflow: hidden;
           text-overflow: ellipsis;
           cursor: pointer;
