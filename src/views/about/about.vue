@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import Vue from "vue";
+// import Vue from "vue";
 import MusicPlayer from "../../components/music_player";
 import ArticleService from "../../services/article_service";
 

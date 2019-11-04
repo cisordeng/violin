@@ -35,7 +35,8 @@ import Login from "components/login";
 
 export default {
   components: {
-    login: Login
+    login: Login,
+    "mavon-editor": MavonEditor.mavonEditor,
   },
   data() {
     return {

@@ -12,9 +12,9 @@ import storeOption from './vuex/store'
 // Vue.use(VueRouter);
 // Vue.use(VueResource);
 
-import mavonEditor from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
-Vue.use(mavonEditor)
+// import mavoneditor from 'mavon-editor'
+// import 'mavon-editor/dist/css/index.css'
+// Vue.use(MavonEditor)
 
 marked.setOptions({
   renderer: new marked.Renderer(),
