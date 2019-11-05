@@ -73,6 +73,18 @@ html, body {
   overflow-x: hidden;
 }
 
+.content img {
+  max-width: 100%;
+}
+.content pre {
+  overflow-x: auto;
+}
+.content mark {
+  color: inherit;
+  background: #dedede;
+  padding: 0 3px;
+}
+
 .slide-right-enter-active,
 .slide-right-leave-active,
 .slide-left-enter-active,

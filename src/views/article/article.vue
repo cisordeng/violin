@@ -11,7 +11,7 @@
     </div>
     <div class="v-i-main">
       <div class="v-i-article">
-        <div class="v-i-content" v-html="article.markedContent"></div>
+        <div class="v-i-content content" v-html="article.markedContent"></div>
       </div>
     </div>
     <svg
@@ -51,7 +51,8 @@ export default {
     let id = this.$route.query.id;
     this.article = await ArticleService.getArticle(id);
 
-    this.article.markedContent = marked(this.article.content);
+    // this.article.markedContent = marked(this.article.content);
+    this.article.markedContent = MavonEditor.markdownIt.render(this.article.content);
 
     document.title = this.article.title;
   }
@@ -144,11 +145,3 @@ export default {
   }
 }
 </style>
-<style>
-.v-i-content img {
-  max-width: 100%;
-}
-.v-i-content pre {
-  overflow-x: auto;
-}
-</style>>

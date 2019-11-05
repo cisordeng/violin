@@ -1,7 +1,7 @@
 <template>
   <div class="v-main">
     <input class="v-i-title" v-model="article.title" placeholder="笔记标题..." />
-    <mavon-editor class="v-i-content" v-model="article.content" />
+    <mavon-editor class="v-i-content content" v-model="article.content" />
     <div class="v-i-post" :class="enablePost ? 'v-i-active' : ''" @click="onClickPost">
       <svg class="icon">
         <use xlink:href="#icon-post" />
