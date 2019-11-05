@@ -33,7 +33,6 @@ import storeOption from './vuex/store'
 //         }
 //     }
 // });
-console.log(MavonEditor.markdownIt)
 MavonEditor.markdownIt.options.highlight = function (code, lang) {
   if (lang && hljs.getLanguage(lang)) {    
     return hljs.highlight(lang, code, true).value;

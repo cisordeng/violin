@@ -75,6 +75,8 @@ html, body {
 
 .content img {
   max-width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
 }
 .content pre {
   overflow-x: auto;

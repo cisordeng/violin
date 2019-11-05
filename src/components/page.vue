@@ -1,6 +1,6 @@
 <template>
   <div class="v-main">
-    <div class="v-i-main">
+    <div v-if="pageInfo.max_page > 1" class="v-i-main">
       <div class="v-i-prev" :class="pageInfo.has_prev ? 'v-i-active' : ''" @click="onClickPrev">
         <svg class="icon">
           <use xlink:href="#icon-prevx" />
@@ -17,6 +17,8 @@
         </svg>
       </div>
     </div>
+    <div v-else-if="pageInfo.max_page == 1" class="v-i-tip"></div>
+    <div v-else class="v-i-tip">这里什么也没有...</div>
     <svg
       style="display: none;"
       xmlns="http://www.w3.org/2000/svg"
@@ -147,6 +149,13 @@ export default {
         font-weight: bold;
       }
     }
+  }
+  .v-i-tip {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
   }
 }
 </style>

@@ -3,9 +3,14 @@ import { nextTick } from "q";
 const NotFound = r => require(['views/notfound'], r);
 
 const About = r => require(['views/about/about'], r);
+
 const Articles = r => require(['views/article/articles'], r);
 const Article = r => require(['views/article/article'], r);
 const EditArticle = r => require(['views/article/edit_article'], r);
+
+const Words = r => require(['views/word/words'], r);
+const Word = r => require(['views/word/word'], r);
+const EditWord = r => require(['views/word/edit_word'], r);
 
 // 根目录
 const rootPath = '';
@@ -35,6 +40,23 @@ const routes = [{
   }, {
     path: '/edit_article',
     component: EditArticle,
+    meta: {
+      keepAlive: true,
+    },
+  }, {
+    path: '/friends',
+    component: Words,
+    meta: {
+      keepAlive: true,
+      title: '动态',
+      isNav: true,
+    },
+  }, {
+    path: '/word',
+    component: Word,
+  }, {
+    path: '/edit_word',
+    component: EditWord,
     meta: {
       keepAlive: true,
     },
