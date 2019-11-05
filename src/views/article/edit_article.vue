@@ -27,10 +27,8 @@
 </template>
 
 <script>
-// import Vue from "vue";
 import ArticleService from "../../services/article_service";
 import UserService from "../../services/user_service";
-// import Resource from '../lib/resource'
 import Login from "components/login";
 
 export default {

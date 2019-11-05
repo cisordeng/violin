@@ -65,9 +65,6 @@
 </template>
 
 <script>
-// import Vue from "vue";
-// import MusicPlayer from "../components/music_player";
-// import Resource from '../lib/resource'
 
 export default {
   props: {},

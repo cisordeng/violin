@@ -32,10 +32,8 @@
 </template>
 
 <script>
-// import Vue from "vue";
 import MusicPlayer from "../../components/music_player";
 import WordService from "../../services/word_service";
-// import Resource from '../lib/resource'
 
 export default {
   components: {
