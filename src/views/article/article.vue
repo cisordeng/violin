@@ -144,3 +144,11 @@ export default {
   }
 }
 </style>
+<style>
+.v-i-content img {
+  max-width: 100%;
+}
+.v-i-content pre {
+  overflow-x: auto;
+}
+</style>>

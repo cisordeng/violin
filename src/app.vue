@@ -57,6 +57,9 @@ html, body {
 ::-webkit-scrollbar {
     width: 10px;
 }
+::-webkit-scrollbar-thumb {
+	background-color: #dedede;
+}
 #app {
   width: calc(100% + 10px);
   height: 100%;
