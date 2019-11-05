@@ -1,5 +1,5 @@
 <template>
-  <div class="v-main">
+  <div class="v-main main">
     <div class="v-i-header">
       <div class="v-i-title">动态</div>
       <div class="v-i-time">{{word && word.created_at && word.created_at.split(' ')[0]}}</div>
@@ -72,7 +72,6 @@ export default {
 .v-main {
   // width: 100%;
   // height: 100%;
-  background: #f0f0f0;
   display: flex;
   flex-direction: column;
   .v-i-header {

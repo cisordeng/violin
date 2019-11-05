@@ -1,5 +1,5 @@
 <template>
-  <div class="v-main">
+  <div class="v-main main">
     <div class="v-i-header v-i-home">
       <img class="v-i-avatar" src="https://s2.ax1x.com/2019/10/26/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>

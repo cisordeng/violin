@@ -1,5 +1,5 @@
 <template>
-  <div class="v-main">
+  <div class="v-main main">
     <div class="v-i-header">
       <div class="v-i-title">动态</div>
       <div class="v-i-subtitle">垃圾桶垃圾桶垃圾桶</div>
@@ -100,7 +100,6 @@ export default {
   fill: currentColor;
 }
 .v-main {
-  background: #f0f0f0;
   display: flex;
   flex-direction: column;
   .v-i-header {

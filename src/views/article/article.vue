@@ -1,5 +1,5 @@
 <template>
-  <div class="v-main">
+  <div class="v-main main">
     <div class="v-i-header">
       <div class="v-i-title">{{article.title}}</div>
       <div class="v-i-time">{{article && article.created_at && article.created_at.split(' ')[0]}}</div>
@@ -72,7 +72,6 @@ export default {
 .v-main {
   // width: 100%;
   // height: 100%;
-  background: #f0f0f0;
   display: flex;
   flex-direction: column;
   .v-i-header {

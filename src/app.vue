@@ -73,6 +73,10 @@ html, body {
   overflow-x: hidden;
 }
 
+.main {
+  background-image: url(https://s2.ax1x.com/2019/11/05/M9WzY4.png);
+}
+
 .content img {
   max-width: 100%;
   padding: 5px;
