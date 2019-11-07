@@ -84,7 +84,7 @@ export default {
         },
         {
           name: "message",
-          href: "/message",
+          href: "/messages",
           title: "留言"
         },
         {

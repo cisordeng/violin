@@ -8,17 +8,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
 
 export default {
   data() {
     return {
-      title: "ERROR!"
     };
   },
-  computed: mapState(["message"]),
   mounted: function() {
-    this.$store.commit("message", "404 Not Found！");
+    document.title = "404 PAGE NOT FOUND";
   },
   components: {}
 };

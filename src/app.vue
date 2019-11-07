@@ -77,6 +77,10 @@ html, body {
   background-image: url(https://s2.ax1x.com/2019/11/05/M9WzY4.png);
 }
 
+.content {
+    font-family: Menlo, "Ubuntu Mono", Consolas, "Courier New",
+      "Microsoft Yahei", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+}
 .content img {
   max-width: 100%;
   padding: 5px;
