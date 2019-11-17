@@ -80,6 +80,7 @@ html, body {
 .content {
     font-family: Menlo, "Ubuntu Mono", Consolas, "Courier New",
       "Microsoft Yahei", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+    word-break: break-word;
 }
 .content img {
   max-width: 100%;

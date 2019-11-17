@@ -13,6 +13,7 @@
       <div class="v-i-word">
         <div class="v-i-content content" v-html="word.markedContent"></div>
       </div>
+      <comment :comments="word.comments" class="v-i-comments"></comment>
     </div>
     <svg
       style="display: none;"
@@ -32,12 +33,12 @@
 </template>
 
 <script>
-import MusicPlayer from "../../components/music_player";
+import Comment from "../../components/comment";
 import WordService from "../../services/word_service";
 
 export default {
   components: {
-    "music-player": MusicPlayer
+    "comment": Comment
   },
   data() {
     return {
@@ -52,7 +53,7 @@ export default {
     // this.word.markedContent = marked(this.word.content);
     this.word.markedContent = MavonEditor.markdownIt.render(this.word.content);
 
-    document.title = this.word.created_at;
+    document.title = `${this.word.user.name}|${this.word.created_at}`;
   }
 };
 </script>
@@ -115,7 +116,8 @@ export default {
   .v-i-main {
     // width: 100%;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     .v-i-word {
       width: 650px;
       padding: 20px 30px;
@@ -133,9 +135,15 @@ export default {
         font-size: 13px;
       }
     }
+    .v-i-comments {
+      width: 650px;
+    }
 
     @media screen and (max-width: 720px), (max-height: 500px) {
       .v-i-word {
+        width: 90%;
+      }
+      .v-i-comments {
         width: 90%;
       }
     }
