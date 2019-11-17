@@ -51,6 +51,24 @@ class WordService extends Service {
         })
         return data;
     }
+
+    async newWordComment(word, comment, content) {
+        var commentId = 0;
+        if (comment && comment.id) {
+            commentId = comment.id;
+        }
+        var data = await Resource.put({
+            service: 'nature',
+            resource: 'comment.comment',
+            data: {
+                resource_type: 'word.word',
+                resource_id: word.id,
+                comment_id: commentId,
+                content: content,
+            }
+        })
+        return data;
+    }
 }
 
 let service = new WordService();

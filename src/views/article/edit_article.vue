@@ -29,7 +29,7 @@
 <script>
 import ArticleService from "../../services/article_service";
 import UserService from "../../services/user_service";
-import Login from "components/login";
+import Login from "../../components/login";
 
 export default {
   components: {
