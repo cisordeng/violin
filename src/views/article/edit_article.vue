@@ -7,7 +7,7 @@
         <use xlink:href="#icon-post" />
       </svg>
     </div>
-    <login :show.sync="showLoginWindow" v-on:exit="loginSuccess"></login>
+    <login :show.sync="showLoginWindow" v-on:exit="loginSuccess" type="admin"></login>
 
     <svg
       style="display: none;"
@@ -60,7 +60,7 @@ export default {
       if (!this.enablePost) {
         return;
       }
-      if (!UserService.isLogined()) {
+      if (!await UserService.isLogined('admin')) {
         this.showLoginWindow = true;
         return;
       }

@@ -1,23 +1,23 @@
 import Resource from '../lib/resource'
 import Service from './service'
 
-class CommentService extends Service {
+class ReplyService extends Service {
     constructor() {
         super();
     }
 
-    async newComment(resource_type, resource, comment, content) {
-        var commentId = 0;
-        if (comment && comment.id) {
-            commentId = comment.id;
+    async newReply(resource_type, resource, reply, content) {
+        var replyId = 0;
+        if (reply && reply.id) {
+            replyId = reply.id;
         }
         var data = await Resource.put({
-            service: 'nature',
-            resource: 'comment.comment',
+            service: 'dolphin',
+            resource: 'reply.reply',
             data: {
                 resource_type: resource_type,
                 resource_id: resource.id,
-                comment_id: commentId,
+                reply_id: replyId,
                 content: content,
             }
         })
@@ -25,6 +25,6 @@ class CommentService extends Service {
     }
 }
 
-let service = new CommentService();
+let service = new ReplyService();
 
 export default service;

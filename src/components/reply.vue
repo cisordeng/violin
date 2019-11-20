@@ -1,21 +1,21 @@
 <template>
   <div class="v-main">
     <div class="v-i-main">
-      <div class="v-i-comment" v-for="comment in markedComments" :key="comment.content">
+      <div class="v-i-reply" v-for="reply in markedReplies" :key="reply.content">
         <div class="v-i-poster">
-          <img class="v-i-avatar" :src="comment.user.avatar" />
+          <img class="v-i-avatar" :src="reply.user.avatar" />
           <div class="v-i-info">
-            <div class="v-i-name">{{comment.user.name}}</div>
-            <div class="v-i-time">{{comment.created_at}}</div>
+            <div class="v-i-name">{{reply.user.name}}</div>
+            <div class="v-i-time">{{reply.created_at}}</div>
           </div>
         </div>
-        <div class="v-i-content content" v-html="comment.markedContent"></div>
+        <div class="v-i-content content" v-html="reply.markedContent"></div>
       </div>
-      <div class="v-i-comment new">
-        <textarea class="v-i-input" :style="`height: ${textHeight}px`" @input="onChangeContent($event)" v-model="newComment.content" placeholder="留下你善意的评论"/>
+      <div class="v-i-reply new">
+        <textarea class="v-i-input" :style="`height: ${textHeight}px`" @input="onChangeContent($event)" v-model="newReply.content" placeholder="留下你善意的评论"/>
         <div class="v-i-action">
-          <div class="v-i-count">{{newComment.content.length}} / {{maxLength}}</div>
-          <div class="v-i-post" :class="enableComment ? 'v-i-active' : ''" @click="onClickPost">
+          <div class="v-i-count">{{newReply.content.length}} / {{maxLength}}</div>
+          <div class="v-i-post" :class="enablereply ? 'v-i-active' : ''" @click="onClickPost">
             <div class="v-i-icon">
               <svg class="icon">
                 <use xlink:href="#icon-post" />
@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <login :show.sync="showLoginWindow" v-on:exit="loginSuccess"></login>
+    <login :show.sync="showLoginWindow" v-on:exit="loginSuccess" type="default"></login>
     <svg
       style="display: none;"
       xmlns="http://www.w3.org/2000/svg"
@@ -46,20 +46,20 @@
 
 <script>
 import UserService from "../services/user_service";
-import CommentService from "../services/comment_service";
+import ReplyService from "../services/reply_service";
 import Login from "../components/login";
 
 export default {
   props: {
-    newComment: {
+    newReply: {
       type: Object,
       default: {
         resource: {},
-        comment: {},
+        reply: {},
         content: '',
       },
     },
-    comments: {
+    replies: {
       type: Array,
       default: []
     }
@@ -75,39 +75,39 @@ export default {
     };
   },
   computed: {
-    markedComments() {
-      this.comments.map(comment => {
-        comment.markedContent = MavonEditor.markdownIt.render(comment.content);
-        return comment;
+    markedReplies() {
+      this.replies.map(reply => {
+        reply.markedContent = MavonEditor.markdownIt.render(reply.content);
+        return reply;
       });
-      return this.comments;
+      return this.replies;
     },
-    enableComment() {
-      return !!this.newComment.content;
+    enablereply() {
+      return !!this.newReply.content;
     }
   },
   methods: {
     onChangeContent(event) {
       this.textHeight = event.target.scrollHeight;
-      this.newComment.content = this.newComment.content.slice(0, this.maxLength);
+      this.newReply.content = this.newReply.content.slice(0, this.maxLength);
     },
     async onClickPost() {
-      if (!this.enableComment) {
+      if (!this.enablereply) {
         return;
       }
-      if (!UserService.isLogined()) {
+      if (!await UserService.isLogined('default')) {
         this.showLoginWindow = true;
         return;
       }
-      CommentService.newComment(
-        this.newComment.resource_type,
-        this.newComment.resource,
-        this.newComment.comment,
-        this.newComment.content,
+      ReplyService.newReply(
+        this.newReply.resource_type,
+        this.newReply.resource,
+        this.newReply.reply,
+        this.newReply.content,
       ).then(data => {
-        this.comments.push(data);
-        this.newComment.comment = {};
-        this.newComment.content = '';
+        this.replies.push(data);
+        this.newReply.reply = {};
+        this.newReply.content = '';
       });
     },
     loginSuccess() {
@@ -140,7 +140,7 @@ export default {
     background: #ffffff;
     box-shadow: 0px 0px 3px #ccc;
     box-sizing: border-box;
-    .v-i-comment {
+    .v-i-reply {
       width: 100%;
       padding: 20px 30px;
       box-sizing: border-box;

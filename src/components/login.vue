@@ -60,7 +60,11 @@ export default {
     show: {
       type: Boolean,
       default: false
-    }
+    },
+    type: {
+      type: String,
+      default: 'default',
+    },
   },
   data() {
     return {
@@ -82,7 +86,7 @@ export default {
       if (!this.enableLogin) {
         return;
       }
-      UserService.loginUser(this.user.name, this.user.password).then(
+      UserService.loginUser(this.user.name, this.user.password, this.type).then(
         data => {
           this.show = false;
           this.$emit("exit");

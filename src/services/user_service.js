@@ -6,13 +6,15 @@ class UserService extends Service {
 		super();
     }
 
-    async loginUser(name, password) {
+    async loginUser(name, password, type) {
+        console.log(type);
         var data = await Resource.put({
-            service: 'nature',
-            resource: 'account.login_user',
+            service: 'leo',
+            resource: 'user.login',
             data: {
                 name: name,
                 password: password,
+                type: type,
             }
         })
         if (data) {
@@ -21,11 +23,19 @@ class UserService extends Service {
         return data;
     }
 
-    isLogined() {
-        if (localStorage.getItem('sid')) {
-            return true;
-        } else {
+    async isLogined(type) {
+        let sid = localStorage.getItem('sid');
+        if (!sid) {
             return false;
+        } else {
+            var data = await Resource.put({
+                service: 'leo',
+                resource: 'user.valid_type',
+                data: {
+                    type: type,
+                }
+            })
+            return data['is_valid'];
         }
     }
 }

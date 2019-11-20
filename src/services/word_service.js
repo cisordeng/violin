@@ -52,18 +52,18 @@ class WordService extends Service {
         return data;
     }
 
-    async newWordComment(word, comment, content) {
-        var commentId = 0;
-        if (comment && comment.id) {
-            commentId = comment.id;
+    async newWordReply(word, reply, content) {
+        var replyId = 0;
+        if (reply && reply.id) {
+            replyId = reply.id;
         }
         var data = await Resource.put({
             service: 'nature',
-            resource: 'comment.comment',
+            resource: 'reply.reply',
             data: {
                 resource_type: 'word.word',
                 resource_id: word.id,
-                comment_id: commentId,
+                reply_id: replyId,
                 content: content,
             }
         })
