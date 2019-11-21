@@ -12,6 +12,8 @@ const Words = r => require(['views/word/words'], r);
 const Word = r => require(['views/word/word'], r);
 const EditWord = r => require(['views/word/edit_word'], r);
 
+const Messages = r => require(['views/message/messages'], r);
+
 // 根目录
 const rootPath = '';
 
@@ -59,6 +61,14 @@ const routes = [{
     component: EditWord,
     meta: {
       keepAlive: true,
+    },
+  }, {
+    path: '/messages',
+    component: Messages,
+    meta: {
+      keepAlive: true,
+      title: '留言',
+      isNav: true,
     },
   },
 ].map((route, index) => {

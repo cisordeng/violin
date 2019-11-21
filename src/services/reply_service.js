@@ -6,7 +6,7 @@ class ReplyService extends Service {
         super();
     }
 
-    async newReply(resource_type, resource, reply, content) {
+    async newReply(resource_type, resource_id, reply, content) {
         var replyId = 0;
         if (reply && reply.id) {
             replyId = reply.id;
@@ -16,9 +16,25 @@ class ReplyService extends Service {
             resource: 'reply.reply',
             data: {
                 resource_type: resource_type,
-                resource_id: resource.id,
+                resource_id: resource_id,
                 reply_id: replyId,
                 content: content,
+            }
+        })
+        return data;
+    }
+
+    async getReplies(resource_type, resource_id, page=1, count_per_page=10) {
+        var data = await Resource.get({
+            service: 'dolphin',
+            resource: 'reply.replies',
+            data: {
+                filters: JSON.stringify({
+                    resource_type: resource_type,
+                    resource_id: resource_id,
+                }),
+                page: page,
+                count_per_page: count_per_page,
             }
         })
         return data;

@@ -101,7 +101,7 @@ export default {
       }
       ReplyService.newReply(
         this.newReply.resource_type,
-        this.newReply.resource,
+        this.newReply.resource.id,
         this.newReply.reply,
         this.newReply.content,
       ).then(data => {
