@@ -3,11 +3,9 @@
 </template>
 
 <script>
-import MusicPlayer from "../components/music_player";
 
 export default {
   components: {
-    "music-player": MusicPlayer
   },
   data() {
     return {};

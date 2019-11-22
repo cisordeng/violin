@@ -1,6 +1,6 @@
 <template>
   <div class="v-main main">
-    <mavon-editor class="v-i-content content" v-model="word.content" />
+    <mavon-editor class="v-i-content content" v-model.trim="word.content" />
     <div class="v-i-post" :class="enablePost ? 'v-i-active' : ''" @click="onClickPost">
       <svg class="icon">
         <use xlink:href="#icon-post" />

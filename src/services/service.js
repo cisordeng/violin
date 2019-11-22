@@ -75,7 +75,6 @@ class ObjectsCache {
 
 class Service {
 	constructor() {
-		console.log('create base service');
 		this.resource2pageinfo = {};
 		this.resource2cache = {};
 		this.id2object = {};
