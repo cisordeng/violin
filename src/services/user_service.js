@@ -7,7 +7,6 @@ class UserService extends Service {
     }
 
     async loginUser(name, password, type) {
-        console.log(type);
         var data = await Resource.put({
             service: 'leo',
             resource: 'user.login',

@@ -67,14 +67,12 @@ export default {
       if (this.pageInfo.has_prev) {
         this.$emit("changePage", "prev");
         this.onTop();
-        console.log("上一页");
       }
     },
     onClickNext() {
       if (this.pageInfo.has_next) {
         this.$emit("changePage", "next");
         this.onTop();
-        console.log("下一页");
       }
     },
     onTop() {

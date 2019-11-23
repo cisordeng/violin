@@ -55,8 +55,6 @@ export default {
   },
   methods: {
     async onClickPost() {
-      console.log("post");
-      console.log(this.article);
       if (!this.enablePost) {
         return;
       }
@@ -93,7 +91,6 @@ export default {
     },
     loginSuccess() {
       this.showLoginWindow = false;
-      console.log(this.showLoginWindow);
     }
   },
   async mounted() {

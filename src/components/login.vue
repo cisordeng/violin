@@ -82,7 +82,6 @@ export default {
   },
   methods: {
     onClickLogin() {
-      console.log(this.user);
       if (!this.enableLogin) {
         return;
       }
@@ -90,20 +89,17 @@ export default {
         data => {
           this.show = false;
           this.$emit("exit");
-          console.log("登陆成功");
         },
         resp => {
           this.loginErrMsg = resp.errMsg;
           setTimeout(() => {
             this.loginErrMsg = "";
           }, 1000);
-          console.log(resp.errMsg);
         }
       );
     },
     onClickClose() {
       this.$emit("exit");
-      console.log("关闭");
     },
   },
   mounted() {}
