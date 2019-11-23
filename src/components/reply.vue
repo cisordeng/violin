@@ -3,7 +3,7 @@
     <div class="v-i-main">
       <div
         class="v-i-reply"
-        :class="newReply.reply && newReply.reply.id == reply.id ? 'v-i-active' : ''"
+        :class="`${newReply.reply && newReply.reply.id == reply.id ? 'v-i-replied' : ''} ${reply.active ? 'v-i-active' : ''}`"
         v-for="reply in markedReplies"
         :key="reply.content"
       >
@@ -13,7 +13,11 @@
             <div class="v-i-title">
               <div class="v-i-name">{{reply.user.name}}</div>
               <div v-if="reply.reply" class="v-i-text">回复</div>
-              <div v-if="reply.reply" class="v-i-replyuser">@{{reply.reply.user.name}}</div>
+              <div
+                v-if="reply.reply"
+                class="v-i-replyuser"
+                @click="onClickReplyUser(reply.reply)"
+              >@{{reply.reply.user.name}}</div>
             </div>
             <div class="v-i-time">{{reply.created_at}}</div>
           </div>
@@ -32,7 +36,7 @@
       </div>
       <div class="v-i-reply new">
         <div v-if="newReply.reply && newReply.reply.user" class="v-i-replyuser">
-          <div class="v-i-text">回复@{{newReply.reply.user.name}}</div>
+          <div class="v-i-text" @click="onClickReplyUser(newReply.reply)">回复@{{newReply.reply.user.name}}</div>
           <div class="v-i-close" @click="onClickCloseReplyUser">
             <svg class="icon">
               <use xlink:href="#icon-close" />
@@ -135,6 +139,19 @@ export default {
       this.newReply.reply = reply;
       this.$refs.textarea.focus();
     },
+    onClickReplyUser(reply) {
+      let id2reply = {};
+      this.replies.forEach(r => {
+        if (reply.id == r.id) {
+          r.active = true;
+          this.$forceUpdate();
+          setTimeout(() => {
+            r.active = false;
+            this.$forceUpdate();
+          }, 1000);
+        }
+      });
+    },
     onClickCloseReplyUser() {
       this.newReply.reply = {};
     },
@@ -199,8 +216,11 @@ export default {
       color: inherit;
       background: inherit;
       transition: 0.3s;
-      &.v-i-active {
+      &.v-i-replied {
         background: rgba($color: #dedede, $alpha: 0.8);
+      }
+      &.v-i-active {
+        animation: 1s bg-trans;
       }
       &:not(:last-child):after {
         content: "";
@@ -247,6 +267,7 @@ export default {
               max-width: 100px;
               text-overflow: ellipsis;
               color: #4b3f90;
+              cursor: pointer;
             }
           }
           .v-i-time {
@@ -395,6 +416,23 @@ export default {
         }
       }
     }
+  }
+}
+@keyframes bg-trans {
+  0% {
+    background: inherit; 
+  }
+  25% {
+    background: rgba($color: #dedede, $alpha: 0.8);
+  }
+  50% {
+    background: inherit;
+  }
+  75% {
+    background: rgba($color: #dedede, $alpha: 0.8);
+  }
+  100% {
+    background: inherit;
   }
 }
 </style>
