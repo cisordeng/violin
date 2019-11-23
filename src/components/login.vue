@@ -14,6 +14,7 @@
             v-model="user.password"
             type="password"
             placeholder="Password"
+            @keyup.enter="onClickLogin"
           />
           <div class="v-i-login" :class="enableLogin ? 'v-i-active' : ''" @click="onClickLogin">
             <svg class="icon">
@@ -63,8 +64,8 @@ export default {
     },
     type: {
       type: String,
-      default: 'default',
-    },
+      default: "default"
+    }
   },
   data() {
     return {
@@ -100,7 +101,7 @@ export default {
     },
     onClickClose() {
       this.$emit("exit");
-    },
+    }
   },
   mounted() {}
 };

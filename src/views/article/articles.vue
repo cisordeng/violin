@@ -219,6 +219,8 @@ export default {
             transform: scale(0.7);
             font-size: 12px;
             line-height: 8px;
+            height: 8px;
+            opacity: 1;
             transition: 0.3s;
             .v-i-unit {
               display: flex;
@@ -228,13 +230,16 @@ export default {
             display: flex;
             font-size: 18px;
             font-weight: bold;
+            height: 26px;
+            opacity: 1;
             transition: 0.3s;
             .v-i-unit {
               display: none;
             }
           }
           .v-i-hide {
-            display: none;
+            height: 0px;
+            opacity: 0;
           }
         }
         .v-i-title {
