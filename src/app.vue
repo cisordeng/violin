@@ -74,7 +74,7 @@ html, body {
 }
 
 .main {
-  background-image: url(https://s2.ax1x.com/2019/11/05/M9WzY4.png);
+  background-image: url(https://i.loli.net/2019/11/24/o3p9Mvhd7LNUXmc.png);
 }
 
 .content {
