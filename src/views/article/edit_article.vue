@@ -1,7 +1,7 @@
 <template>
   <div class="v-main main">
     <input class="v-i-title" v-model.trim="article.title" placeholder="笔记标题..." />
-    <mavon-editor class="v-i-content content" v-model.trim="article.content" />
+    <mavon-editor class="v-i-content content" v-model.trim="article.content" @imgAdd="onClickUploadImage"/>
     <div class="v-i-post" :class="enablePost ? 'v-i-active' : ''" @click="onClickPost">
       <svg class="icon">
         <use xlink:href="#icon-post" />
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import Uploader from '../../lib/upload';
 import ArticleService from "../../services/article_service";
 import UserService from "../../services/user_service";
 import Login from "../../components/login";
@@ -54,6 +55,14 @@ export default {
     }
   },
   methods: {
+    async onClickUploadImage(pos, file) {
+      let imgStr = `![${file.name}](${pos})`;
+      let loadImgStr = `![图片上传中...](${pos})`;
+      this.article.content = this.article.content.replace(imgStr, loadImgStr);
+      let url = await Uploader.upload(file);
+      let newImgStr = `![](${url})`;
+      this.article.content = this.article.content.replace(loadImgStr, newImgStr);
+    },
     async onClickPost() {
       if (!this.enablePost) {
         return;

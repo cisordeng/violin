@@ -7,6 +7,9 @@ let Resource = {
     API_SERVER: API_SERVER,
 
     query(options) {
+        if (options.url) {
+            return this.gateaway(options);
+        }
         let service = options.service;
         let resource = options.resource.replace(/\./g, '/');
         let data = options.data;
@@ -47,6 +50,37 @@ let Resource = {
                 } else {
                     reject(resp.data);
                 }
+            }, resp => {
+                reject(resp.data);
+            });
+        })
+    },
+
+    gateaway(options) {
+        let url = options.url;
+        let method = options.method;
+        let body = options.body || {};
+        let params = options.data || {};
+        let headers = options.headers || {};
+        if (options.method === "GET") {
+            return new Promise((resolve, reject) => {
+                Vue.http.options.emulateJSON = true;
+                Vue.http[options.method.toLocaleLowerCase()](url, {
+                    params: params,
+                }).then(resp => {
+                    resolve(resp.data);
+                }, resp => {
+                    reject(resp.data);
+                });
+            })
+        }
+        return new Promise((resolve, reject) => {
+            Vue.http[options.method.toLocaleLowerCase()](url, body, {
+                headers: headers,
+                method: method,
+                params: params,
+            }).then(resp => {
+                resolve(resp.data);
             }, resp => {
                 reject(resp.data);
             });

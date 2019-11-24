@@ -1,6 +1,6 @@
 <template>
   <div class="v-main main">
-    <mavon-editor class="v-i-content content" v-model.trim="word.content" />
+    <mavon-editor class="v-i-content content" v-model.trim="word.content" @imgAdd="onClickUploadImage"/>
     <div class="v-i-post" :class="enablePost ? 'v-i-active' : ''" @click="onClickPost">
       <svg class="icon">
         <use xlink:href="#icon-post" />
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import Uploader from '../../lib/upload';
 import WordService from "../../services/word_service";
 import UserService from "../../services/user_service";
 import Login from "../../components/login";
@@ -52,6 +53,14 @@ export default {
     }
   },
   methods: {
+    async onClickUploadImage(pos, file) {
+      let imgStr = `![${file.name}](${pos})`;
+      let loadImgStr = `![图片上传中...](${pos})`;
+      this.word.content = this.word.content.replace(imgStr, loadImgStr);
+      let url = await Uploader.upload(file);
+      let newImgStr = `![](${url})`;
+      this.word.content = this.word.content.replace(loadImgStr, newImgStr);
+    },
     async onClickPost() {
       if (!this.enablePost) {
         return;
