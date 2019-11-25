@@ -2,7 +2,7 @@
   <div class="v-main" :class="show ? 'v-i-active' : ''">
     <div class="v-i-main" :class="loginErrMsg != '' ? 'v-i-err' : ''">
       <div class="v-i-header">
-        <img class="v-i-avatar" src="https://i.loli.net/2019/10/26/R53x1vimPTUL7Ka.gif" />
+        <img class="v-i-avatar" src="https://i.ibb.co/stYmBNJ/KBxNDJ.gif" />
       </div>
       <div class="v-i-form">
         <div class="v-i-input">
@@ -159,7 +159,7 @@ export default {
     .v-i-header {
       width: 100%;
       height: 150px;
-      background-image: url(https://i.loli.net/2019/11/24/nLZmPcGxDlzFApH.jpg);
+      background-image: url(https://i.ibb.co/pyvmdWP/KOublR.jpg);
       background-size: cover;
       display: flex;
       align-items: flex-end;

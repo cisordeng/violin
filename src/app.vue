@@ -74,7 +74,7 @@ html, body {
 }
 
 .main {
-  background-image: url(https://i.loli.net/2019/11/24/o3p9Mvhd7LNUXmc.png);
+  background-image: url(https://i.ibb.co/vctBJnd/M9WzY4.png);
 }
 
 .content {

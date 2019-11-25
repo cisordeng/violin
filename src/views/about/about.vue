@@ -1,7 +1,7 @@
 <template>
   <div class="v-main main">
     <div class="v-i-header v-i-home">
-      <img class="v-i-avatar" src="https://i.loli.net/2019/10/26/R53x1vimPTUL7Ka.gif" />
+      <img class="v-i-avatar" src="https://i.ibb.co/stYmBNJ/KBxNDJ.gif" />
       <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
       <div class="v-i-navs">
         <div v-for="nav in navs" :key="nav.name" class="v-i-nav">
