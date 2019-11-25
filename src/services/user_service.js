@@ -6,6 +6,20 @@ class UserService extends Service {
 		super();
     }
 
+    async registerUser(name, password, type) {
+        var data = await Resource.put({
+            service: 'leo',
+            resource: 'user.user',
+            data: {
+                name: name,
+                password: password,
+                avatar: '',
+                type: type,
+            }
+        })
+        return data;
+    }
+
     async loginUser(name, password, type) {
         var data = await Resource.put({
             service: 'leo',

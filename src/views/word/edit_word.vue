@@ -95,7 +95,7 @@ export default {
       }
     },
     loginSuccess() {
-      this.showLoginWindow = false;s
+      this.showLoginWindow = false;
     }
   },
   async mounted() {

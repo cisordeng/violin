@@ -1,24 +1,66 @@
 <template>
   <div class="v-main" :class="show ? 'v-i-active' : ''">
-    <div class="v-i-main" :class="loginErrMsg != '' ? 'v-i-err' : ''">
+    <div class="v-i-main" :class="errMsg != '' ? 'v-i-err' : ''">
       <div class="v-i-header">
         <img class="v-i-avatar" src="https://i.ibb.co/stYmBNJ/KBxNDJ.gif" />
       </div>
-      <div class="v-i-form">
+      <div class="v-i-tabs">
+        <div
+          class="v-i-tab"
+          :class="action == 'login' ? 'v-i-active' : ''"
+          @click="onClickToAction('login')"
+        >登录</div>
+        <div
+          class="v-i-tab"
+          :class="action == 'register' ? 'v-i-active' : ''"
+          @click="onClickToAction('register')"
+        >注册</div>
+      </div>
+      <div v-if="action == 'login'" class="v-i-form">
         <div class="v-i-input">
-          <input class="v-i-username" v-model="user.name" placeholder="Username" />
+          <input
+            class="v-i-username"
+            v-model="login.name"
+            :placeholder="`${type == 'admin' ? '管理员' : '用户名'}`"
+          />
         </div>
         <div class="v-i-input">
           <input
             class="v-i-password"
-            v-model="user.password"
+            v-model="login.password"
             type="password"
-            placeholder="Password"
+            placeholder="密码"
             @keyup.enter="onClickLogin"
           />
           <div class="v-i-login" :class="enableLogin ? 'v-i-active' : ''" @click="onClickLogin">
             <svg class="icon">
               <use xlink:href="#icon-login" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div v-if="action == 'register'" class="v-i-form">
+        <div class="v-i-input">
+          <input
+            class="v-i-username"
+            v-model="register.name"
+            :placeholder="`${type == 'admin' ? '管理员' : '用户名'}`"
+          />
+        </div>
+        <div class="v-i-input">
+          <input class="v-i-password" v-model="register.password" type="password" placeholder="密码" />
+        </div>
+        <div class="v-i-input">
+          <input
+            class="v-i-password"
+            v-model="register.confirmPassword"
+            type="password"
+            placeholder="确认密码"
+            @keyup.enter="onClickRegister"
+          />
+          <div class="v-i-register" :class="enableRegister ? 'v-i-active' : ''" @click="onClickRegister">
+            <svg class="icon">
+              <use xlink:href="#icon-register" />
             </svg>
           </div>
         </div>
@@ -36,6 +78,15 @@
       xmlns:xlink="http://www.w3.org/1999/xlink"
     >
       <defs>
+        <symbol id="icon-register" viewBox="0 0 1024 1024">
+          <title>注册</title>
+          <path
+            d="M722.6 645.295c17.497-26.999 9.793-63.072-17.206-80.567-21.997-14.255-45.104-26.406-69.045-36.377 69.66-51.387 114.937-134.006 114.937-227.013 0-155.467-126.483-281.951-281.951-281.951s-281.951 126.483-281.951 281.951c0 92.95 45.223 175.527 114.811 226.919-51.763 21.557-99.309 53.261-140.153 94.103-82.080 82.080-127.284 191.213-127.284 307.292 0 32.174 26.082 58.254 58.254 58.254s58.254-26.080 58.254-58.254c0-175.385 142.685-318.068 318.068-318.068 61.579 0 121.298 17.606 172.699 50.915 27.002 17.498 63.074 9.793 80.567-17.206zM469.334 135.897c91.225 0 165.442 74.218 165.442 165.442s-74.218 165.442-165.442 165.442c-91.225 0-165.442-74.217-165.442-165.442s74.218-165.442 165.442-165.442z"
+          />
+          <path
+            d="M926.63 743.197h-66.992v-66.992c0-32.174-26.080-58.254-58.254-58.254s-58.254 26.080-58.254 58.254v66.992h-66.992c-32.174 0-58.254 26.080-58.254 58.254s26.080 58.254 58.254 58.254h66.992v66.992c0 32.174 26.080 58.254 58.254 58.254s58.254-26.080 58.254-58.254v-66.992h66.992c32.174 0 58.254-26.080 58.254-58.254s-26.080-58.254-58.254-58.254z"
+          />
+        </symbol>
         <symbol id="icon-login" viewBox="0 0 1024 1024">
           <title>登录</title>
           <path
@@ -62,6 +113,10 @@ export default {
       type: Boolean,
       default: false
     },
+    action: {
+      type: String,
+      default: "login"
+    },
     type: {
       type: String,
       default: "default"
@@ -69,32 +124,70 @@ export default {
   },
   data() {
     return {
-      loginErrMsg: "",
-      user: {
+      errMsg: "",
+      login: {
         name: "",
-        password: ""
+        password: "",
+        reset() {
+          this.name = "";
+          this.password = "";
+        },
+      },
+      register: {
+        name: "",
+        password: "",
+        confirmPassword: "",
+        reset() {
+          this.name = "";
+          this.password = "";
+          this.confirmPassword = "";
+        },
       }
     };
   },
   computed: {
+    enableRegister() {
+      return this.register.name != "" && this.register.password != "" && this.register.confirmPassword != "" && this.register.password == this.register.confirmPassword;
+    },
     enableLogin() {
-      return this.user.name != "" && this.user.password != "";
+      return this.login.name != "" && this.login.password != "";
     }
   },
   methods: {
+    onClickToAction(action) {
+      this.action = action;
+      this[action].reset();
+    },
+    onClickRegister() {
+      if (!this.enableRegister) {
+        return;
+      }
+      UserService.registerUser(this.register.name, this.register.password, this.type).then(
+        data => {
+          this.action = 'login';
+          this.login.name = data.name;
+        },
+        resp => {
+          this.errMsg = resp.errMsg;
+          setTimeout(() => {
+            this.errMsg = "";
+          }, 1000);
+        }
+      );
+    },
     onClickLogin() {
       if (!this.enableLogin) {
         return;
       }
-      UserService.loginUser(this.user.name, this.user.password, this.type).then(
+      UserService.loginUser(this.login.name, this.login.password, this.type).then(
         data => {
           this.show = false;
           this.$emit("exit");
         },
         resp => {
-          this.loginErrMsg = resp.errMsg;
+          this.errMsg = resp.errMsg;
           setTimeout(() => {
-            this.loginErrMsg = "";
+            this.errMsg = "";
           }, 1000);
         }
       );
@@ -148,7 +241,6 @@ export default {
     background: #f0f0f0;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
     width: 350px;
-    height: 300px;
     border-radius: 5px;
     overflow: hidden;
     transform: scale(0.5);
@@ -172,16 +264,32 @@ export default {
         z-index: 1;
       }
     }
+    .v-i-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin: 30px 0 0 0;
+      font-size: 12px;
+      width: 70px;
+      color: #808080;
+      .v-i-tab {
+        cursor: pointer;
+        &.v-i-active {
+          color: #4b3f90;
+          font-weight: bold;
+        }
+      }
+    }
     .v-i-form {
       display: flex;
       align-items: center;
       justify-content: space-around;
       flex-direction: column;
-      height: 90px;
-      margin: 20px 0;
+      margin: 10px 0 20px 0;
       .v-i-input {
         display: flex;
         position: relative;
+        margin: 5px 0;
         .v-i-username,
         .v-i-password {
           min-height: 28px;
@@ -206,7 +314,11 @@ export default {
               0 0 0 0.2em rgba(3, 102, 214, 0.3);
           }
         }
+        .v-i-register,
         .v-i-login {
+          @extend .v-i-after;
+        }
+        .v-i-after {
           box-sizing: border-box;
           display: flex;
           align-items: center;
@@ -217,7 +329,7 @@ export default {
           height: 38px;
           bottom: 0;
           right: 0;
-          margin: 0 -58px 0 0;
+          margin: 0 -48px 0 0;
           border-radius: 3px;
           padding: 10px;
           color: #757575;
@@ -247,11 +359,13 @@ export default {
       color: #fff;
       font-size: 16px;
       cursor: pointer;
+      animation: trans-color 4s infinite;
       transform: rotate(0deg) scale(0.8);
       transition: 0.3s;
       &:hover {
         transform: rotate(360deg) scale(1);
-        animation: rotate 0.5s 1;
+        animation: none;
+        color: red;
       }
     }
   }
@@ -267,6 +381,18 @@ export default {
   }
   100% {
     transform: scale(1.2);
+  }
+}
+
+@keyframes trans-color {
+  0% {
+    color: #4b3f90;
+  }
+  50% {
+    color: #fff;
+  }
+  100% {
+    color: #4b3f90;
   }
 }
 

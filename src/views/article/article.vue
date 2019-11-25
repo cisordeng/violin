@@ -215,10 +215,10 @@ export default {
 
     @media screen and (max-width: 720px), (max-height: 500px) {
       .v-i-article {
-        width: 90%;
+        width: 100%;
       }
       .v-i-replies {
-        width: 90%;
+        width: 100%;
       }
     }
   }
