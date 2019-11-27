@@ -1,5 +1,5 @@
 <template>
-  <div class="v-main" :class="show ? 'v-i-active' : ''">
+  <div class="v-login" :class="show ? 'v-i-active' : ''">
     <div class="v-i-main" :class="errMsg != '' ? 'v-i-err' : ''">
       <div class="v-i-header">
         <img class="v-i-avatar" src="https://i.ibb.co/stYmBNJ/KBxNDJ.gif" />
@@ -210,7 +210,7 @@ export default {
   stroke: currentColor;
   fill: currentColor;
 }
-.v-main {
+.v-login {
   position: fixed;
   left: 0;
   top: 0;
@@ -226,7 +226,7 @@ export default {
   pointer-events: none;
   opacity: 0;
   transition: 0.3s;
-  .v-i-active {
+  &.v-i-active {
     pointer-events: auto;
     opacity: 1;
     .v-i-main {

@@ -3,6 +3,7 @@
     <music-player></music-player>
     <top></top>
     <navs></navs>
+    <images></images>
     <keep-alive>
       <transition :name="transitionName">
         <router-view v-if="$route.meta.keepAlive"></router-view>
@@ -18,12 +19,14 @@
 import MusicPlayer from "components/music_player";
 import Top from "components/top";
 import Navs from "components/navs";
+import Images from "components/images";
 export default {
   name: 'App',
   components: {
     "music-player": MusicPlayer,
     "top": Top,
     "navs": Navs,
+    "images": Images,
   },
   data() {
     return {
