@@ -64,6 +64,8 @@ export default {
   methods: {
     onClickContent(event) {
       if (event.target.nodeName == 'IMG') {
+        this.$refs.curimage.src = "";
+        this.$forceUpdate();
         this.$refs.curimage.src = event.target.src;
         this.show = true;
       }
