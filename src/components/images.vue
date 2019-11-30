@@ -139,8 +139,8 @@ a .content img {
     }
     .v-i-curimage {
       cursor: zoom-out;
-      max-width: 100%;
-      max-height: 100%;
+      max-width: 100vw;
+      max-height: 100vh;
       // min-width: 500px;
       // min-height: 500px;
     }

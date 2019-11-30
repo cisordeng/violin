@@ -87,6 +87,7 @@ html, body {
 }
 .content img {
   max-width: 100%;
+  max-height: 320px;
   padding: 5px;
   box-sizing: border-box;
 }
