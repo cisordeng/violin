@@ -65,6 +65,7 @@ export default {
     onClickContent(event) {
       if (event.target.nodeName == 'IMG') {
         this.curImage = event.target;
+        this.$forceUpdate();
         this.show = true;
       }
     },
