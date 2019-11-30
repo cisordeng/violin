@@ -54,26 +54,19 @@ export default {
   watch: {
     $route(to, from) {
       this.$nextTick(() => {
-        setTimeout(() => {
-          let imgs = document.querySelectorAll(".content img");
-          imgs.forEach(img => {
-            img.addEventListener("click", this.onClickImage);
-            img.style.cursor = 'zoom-in';
-          });
-          imgs = document.querySelectorAll("a .content img");
-          imgs.forEach(img => {
-            img.removeEventListener("click", this.onClickImage);
-            img.style.cursor = 'inherit';
-          });
-        }, 2000);
+        let contents = document.querySelectorAll(".content");
+        contents.forEach(content => {
+          content.addEventListener("click", this.onClickContent);
+        });
       });
     }
   },
   methods: {
-    onClickImage(event) {
-      this.curImage = event.target;
-      this.show = true;
-      this.$forceUpdate();
+    onClickContent(event) {
+      if (event.target.nodeName == 'IMG') {
+        this.curImage = event.target;
+        this.show = true;
+      }
     },
     onClickClose() {
       this.show = false;
@@ -92,6 +85,14 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style lang="scss">
+a .content img {
+  cursor: inherit;
+}
+.content img {
+  cursor: zoom-in;
+}
+</style>>
 <style lang="scss" scoped>
 .icon {
   display: inline-block;

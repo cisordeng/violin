@@ -1,8 +1,3 @@
-/**
- * Created by an.han on 16/10/15.
- */
-
-
 // 生成 mutations 方法
 function generate(name) {
   return function (state, value) {

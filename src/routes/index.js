@@ -1,5 +1,3 @@
-import { nextTick } from "q";
-
 const NotFound = r => require(['views/notfound'], r);
 
 const About = r => require(['views/about/about'], r);
