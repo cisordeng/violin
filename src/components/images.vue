@@ -6,7 +6,7 @@
           <use xlink:href="#icon-prevx" />
         </svg>
       </div>-->
-      <img class="v-i-curimage" :src="curImage.src" />
+      <img class="v-i-curimage" :src="curSrc" />
       <!-- <div
         class="v-i-next"
         :class="curImage.index < images.length - 1 ? 'v-i-active' : ''"
@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       show: false,
-      curImage: {},
+      curSrc: '',
       images: []
     };
   },
@@ -64,9 +64,10 @@ export default {
   methods: {
     onClickContent(event) {
       if (event.target.nodeName == 'IMG') {
-        this.curImage = event.target;
+        this.curSrc = event.target.src;
         this.show = true;
       }
+      this.$forceUpdate();
     },
     onClickClose() {
       this.show = false;
