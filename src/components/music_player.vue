@@ -4,41 +4,93 @@
     :class="(showPlayer ? '' : 'v-i-hide') + (fixed ? ' v-i-fixed' : '')"
     @click="() => { if (!this.onceClicked) { this.loadSpectrum();} this.onceClicked = true; }"
   >
+    <div class="v-list" :class="showList ? 'v-i-active' : ''">
+      <div class="v-set" v-show="listMode == 'sets'">
+        <div class="v-i-sets">
+          <div v-for="(set, index) in sets" :key="index" class="v-i-set" @click="onClickSet(index)">
+            <img class="v-i-avatar" :src="set.avatar" />
+            <div class="v-i-name">{{set.name}}</div>
+          </div>
+        </div>
+        <page :pageInfo.sync="setPageInfo" v-on:changePage="onChangeSetPage"></page>
+      </div>
+      <div class="v-song" v-show="listMode == 'songs'">
+        <div class="v-i-songs">
+          <div class="v-i-song v-i-title">
+            <div class="v-i-avatar"></div>
+            <div class="v-i-name">音乐标题</div>
+            <div class="v-i-singer">歌手</div>
+          </div>
+          <div
+            v-for="(song, index) in songs"
+            :key="index"
+            class="v-i-song"
+            :class="currentSong && currentSong.id == song.id ? 'v-i-active' : ''"
+            @click="onClickSong(index)"
+          >
+            <img class="v-i-avatar" :src="song.avatar" />
+            <div class="v-i-name" :title="song.name">{{song.name}}</div>
+            <div class="v-i-singer" :title="song.singer_name">{{song.singer_name}}</div>
+          </div>
+        </div>
+        <page :pageInfo.sync="songPageInfo" v-on:changePage="onChangeSongPage"></page>
+      </div>
+      <div class="v-swap" :title="listMode == 'sets' ? '歌曲列表' : '歌单列表'" @click="onClickListMode">
+        <svg class="icon" :class="listMode == 'sets' ? 'v-i-right' : 'v-i-left'">
+          <use xlink:href="#icon-left" />
+        </svg>
+      </div>
+    </div>
     <div class="player">
       <div class="player__top">
         <div class="player-cover">
           <transition-group :name="transitionName">
             <div
-              v-for="(track, index) in tracks"
-              :key="track.cover"
+              v-for="(track, index) in songs"
+              :key="track.avatar"
               class="player-cover__item"
-              :style="`background-image: url(${(index == currentTrackIndex || index == (currentTrackIndex - 1 < 0 ? tracks.length - 1 : currentTrackIndex - 1) || index == (currentTrackIndex + 1 > tracks.length - 1 ? 0 : currentTrackIndex + 1)) ? track.cover : ''});`"
-              v-show="index == currentTrackIndex"
+              :style="`background-image: url(${(index == currentSongIndex || index == (currentSongIndex - 1 < 0 ? songs.length - 1 : currentSongIndex - 1) || index == (currentSongIndex + 1 > songs.length - 1 ? 0 : currentSongIndex + 1)) ? track.avatar : ''});`"
+              v-show="index == currentSongIndex"
             ></div>
           </transition-group>
           <div class="v-i-bars">
             <div
-              v-for="bar in spectrumBars"
+              v-for="(bar, index) in spectrumBars"
+              :key="index"
               class="v-i-bar"
               :style="`width: ${100 / spectrumBars.length}%;height: ${bar * spectrumBarSensitivity}px`"
             ></div>
+          </div>
+          <div v-if="currentSong && currentSong.second2lyric" class="v-i-lyrics">
+            <transition-group name="scale-in" style="align-self: flex-end;">
+              <div
+                v-for="lyric in currentSong.second2lyric"
+                :key="lyric[0]"
+                class="v-i-lyric"
+                v-show="$refs.audio.currentTime >= parseFloat(lyric[0])"
+              >{{lyric[1]}}</div>
+            </transition-group>
           </div>
         </div>
         <div class="player-controls">
           <div
             class="player-controls__item -favorite"
-            :class="currentTrack && currentTrack.favorited ? 'active' : ''"
+            :class="currentSong && currentSong.favorited ? 'active' : ''"
             @click="favorite"
           >
             <svg class="icon">
               <use xlink:href="#icon-heart-o" />
             </svg>
           </div>
-          <a href="https://www.baidu.com/" target="_blank" class="player-controls__item">
+          <div
+            class="player-controls__item -list"
+            :class="showList ? 'active' : ''"
+            @click="onClickList"
+          >
             <svg class="icon">
-              <use xlink:href="#icon-link" />
+              <use xlink:href="#icon-list" />
             </svg>
-          </a>
+          </div>
           <div class="player-controls__item" @click="prevTrack">
             <svg class="icon">
               <use xlink:href="#icon-prev" />
@@ -59,8 +111,8 @@
       <div class="progress">
         <div class="progress__top">
           <div class="album-info">
-            <div class="album-info__name">{{currentTrack && currentTrack.artist}}</div>
-            <div class="album-info__track">{{currentTrack && currentTrack.name}}</div>
+            <div class="album-info__name">{{currentSong && currentSong.singer_name}}</div>
+            <div class="album-info__track">{{currentSong && currentSong.name}}</div>
           </div>
           <div class="progress__duration">{{duration}}</div>
         </div>
@@ -149,16 +201,10 @@
             d="M16 32c-8.832 0-16-7.168-16-16s7.168-16 16-16 16 7.168 16 16-7.168 16-16 16zM16 0.672c-8.448 0-15.328 6.88-15.328 15.328s6.88 15.328 15.328 15.328c8.448 0 15.328-6.88 15.328-15.328s-6.88-15.328-15.328-15.328zM16 29.568c-7.488 0-13.568-6.080-13.568-13.568s6.080-13.568 13.568-13.568c7.488 0 13.568 6.080 13.568 13.568s-6.080 13.568-13.568 13.568zM16 3.104c-7.104 0-12.896 5.792-12.896 12.896s5.792 12.896 12.896 12.896c7.104 0 12.896-5.792 12.896-12.896s-5.792-12.896-12.896-12.896z"
           />
         </symbol>
-        <symbol id="icon-link" viewBox="0 0 32 32">
-          <title>link</title>
+        <symbol id="icon-list" viewBox="0 0 1024 1024">
+          <title>list</title>
           <path
-            d="M23.584 17.92c0 0.864 0 1.728 0 2.56 0 1.312 0 2.656 0 3.968 0 0.352 0.032 0.736-0.032 1.12 0.032-0.16 0.032-0.288 0.064-0.448-0.032 0.224-0.096 0.448-0.16 0.64 0.064-0.128 0.128-0.256 0.16-0.416-0.096 0.192-0.192 0.384-0.32 0.576 0.096-0.128 0.16-0.224 0.256-0.352-0.128 0.16-0.288 0.32-0.48 0.48 0.128-0.096 0.224-0.16 0.352-0.256-0.192 0.128-0.352 0.256-0.576 0.32 0.128-0.064 0.256-0.128 0.416-0.16-0.224 0.096-0.416 0.16-0.64 0.16 0.16-0.032 0.288-0.032 0.448-0.064-0.256 0.032-0.512 0.032-0.768 0.032-0.448 0-0.896 0-1.312 0-1.472 0-2.976 0-4.448 0-1.824 0-3.616 0-5.44 0-1.568 0-3.104 0-4.672 0-0.736 0-1.44 0-2.176 0-0.128 0-0.224 0-0.352-0.032 0.16 0.032 0.288 0.032 0.448 0.064-0.224-0.032-0.448-0.096-0.64-0.16 0.128 0.064 0.256 0.128 0.416 0.16-0.192-0.096-0.384-0.192-0.576-0.32 0.128 0.096 0.224 0.16 0.352 0.256-0.16-0.128-0.32-0.288-0.48-0.48 0.096 0.128 0.16 0.224 0.256 0.352-0.128-0.192-0.256-0.352-0.32-0.576 0.064 0.128 0.128 0.256 0.16 0.416-0.096-0.224-0.16-0.416-0.16-0.64 0.032 0.16 0.032 0.288 0.064 0.448-0.032-0.256-0.032-0.512-0.032-0.768 0-0.448 0-0.896 0-1.312 0-1.472 0-2.976 0-4.448 0-1.824 0-3.616 0-5.44 0-1.568 0-3.104 0-4.672 0-0.736 0-1.44 0-2.176 0-0.128 0-0.224 0.032-0.352-0.032 0.16-0.032 0.288-0.064 0.448 0.032-0.224 0.096-0.448 0.16-0.64-0.064 0.128-0.128 0.256-0.16 0.416 0.096-0.192 0.192-0.384 0.32-0.576-0.096 0.128-0.16 0.224-0.256 0.352 0.128-0.16 0.288-0.32 0.48-0.48-0.128 0.096-0.224 0.16-0.352 0.256 0.192-0.128 0.352-0.256 0.576-0.32-0.128 0.064-0.256 0.128-0.416 0.16 0.224-0.096 0.416-0.16 0.64-0.16-0.16 0.032-0.288 0.032-0.448 0.064 0.48-0.064 0.96-0.032 1.44-0.032 0.992 0 1.952 0 2.944 0 1.216 0 2.432 0 3.616 0 1.056 0 2.112 0 3.168 0 0.512 0 1.024 0 1.536 0 0 0 0 0 0.032 0 0.448 0 0.896-0.192 1.184-0.48s0.512-0.768 0.48-1.184c-0.032-0.448-0.16-0.896-0.48-1.184s-0.736-0.48-1.184-0.48c-0.64 0-1.28 0-1.92 0-1.408 0-2.816 0-4.224 0-1.44 0-2.848 0-4.256 0-0.672 0-1.344 0-2.016 0-0.736 0-1.472 0.192-2.112 0.576s-1.216 0.96-1.568 1.6c-0.384 0.64-0.544 1.376-0.544 2.144 0 0.672 0 1.376 0 2.048 0 1.28 0 2.56 0 3.84 0 1.504 0 3.040 0 4.544 0 1.408 0 2.848 0 4.256 0 0.992 0 1.952 0 2.944 0 0.224 0 0.448 0 0.64 0 0.864 0.224 1.76 0.768 2.464 0.16 0.192 0.288 0.384 0.48 0.576s0.384 0.352 0.608 0.512c0.32 0.224 0.64 0.384 1.024 0.512 0.448 0.16 0.928 0.224 1.408 0.224 0.16 0 0.32 0 0.48 0 0.896 0 1.792 0 2.72 0 1.376 0 2.784 0 4.16 0 1.536 0 3.040 0 4.576 0 1.312 0 2.656 0 3.968 0 0.768 0 1.536 0 2.336 0 0.416 0 0.832-0.032 1.248-0.128 1.504-0.32 2.784-1.6 3.104-3.104 0.128-0.544 0.128-1.056 0.128-1.568 0-0.608 0-1.184 0-1.792 0-1.408 0-2.816 0-4.224 0-0.256 0-0.512 0-0.768 0-0.448-0.192-0.896-0.48-1.184s-0.768-0.512-1.184-0.48c-0.448 0.032-0.896 0.16-1.184 0.48-0.384 0.384-0.576 0.768-0.576 1.248v0z"
-          />
-          <path
-            d="M32 11.232c0-0.8 0-1.568 0-2.368 0-1.248 0-2.528 0-3.776 0-0.288 0-0.576 0-0.864 0-0.896-0.768-1.696-1.696-1.696-0.8 0-1.568 0-2.368 0-1.248 0-2.528 0-3.776 0-0.288 0-0.576 0-0.864 0-0.448 0-0.896 0.192-1.184 0.48s-0.512 0.768-0.48 1.184c0.032 0.448 0.16 0.896 0.48 1.184s0.736 0.48 1.184 0.48c0.8 0 1.568 0 2.368 0 1.248 0 2.528 0 3.776 0 0.288 0 0.576 0 0.864 0-0.576-0.576-1.12-1.12-1.696-1.696 0 0.8 0 1.568 0 2.368 0 1.248 0 2.528 0 3.776 0 0.288 0 0.576 0 0.864 0 0.448 0.192 0.896 0.48 1.184s0.768 0.512 1.184 0.48c0.448-0.032 0.896-0.16 1.184-0.48 0.352-0.256 0.544-0.64 0.544-1.12v0z"
-          />
-          <path
-            d="M15.040 21.888c0.16-0.16 0.288-0.288 0.448-0.448 0.384-0.384 0.8-0.8 1.184-1.184 0.608-0.608 1.184-1.184 1.792-1.792 0.704-0.704 1.44-1.44 2.176-2.176 0.8-0.8 1.568-1.568 2.368-2.368s1.6-1.6 2.4-2.4c0.736-0.736 1.504-1.504 2.24-2.24 0.64-0.64 1.248-1.248 1.888-1.888 0.448-0.448 0.896-0.896 1.344-1.344 0.224-0.224 0.448-0.416 0.64-0.64 0 0 0.032-0.032 0.032-0.032 0.32-0.32 0.48-0.768 0.48-1.184s-0.192-0.896-0.48-1.184c-0.32-0.288-0.736-0.512-1.184-0.48-0.512 0.032-0.928 0.16-1.248 0.48-0.16 0.16-0.288 0.288-0.448 0.448-0.384 0.384-0.8 0.8-1.184 1.184-0.608 0.608-1.184 1.184-1.792 1.792-0.704 0.704-1.44 1.44-2.176 2.176-0.8 0.8-1.568 1.568-2.368 2.368s-1.6 1.6-2.4 2.4c-0.736 0.736-1.504 1.504-2.24 2.24-0.64 0.64-1.248 1.248-1.888 1.888-0.448 0.448-0.896 0.896-1.344 1.344-0.224 0.224-0.448 0.416-0.64 0.64 0 0-0.032 0.032-0.032 0.032-0.32 0.32-0.48 0.768-0.48 1.184s0.192 0.896 0.48 1.184c0.32 0.288 0.736 0.512 1.184 0.48 0.48 0 0.928-0.16 1.248-0.48v0z"
+            d="M960 160a74.24 74.24 0 0 0-74.24-73.92c-391.04 0-542.08 64-556.8 71.68A74.56 74.56 0 0 0 288 224v418.24c-122.56-24-224 53.76-224 155.52 0 88.32 86.08 160 192 160s189.12-69.44 192-155.84V340.48A1251.52 1251.52 0 0 1 800 288v279.68a181.44 181.44 0 0 0-224 166.4c0 88.32 86.08 160 192 160s188.8-68.8 192-154.88z"
           />
         </symbol>
         <symbol id="icon-next" viewBox="0 0 32 32">
@@ -180,10 +226,19 @@
           />
         </symbol>
 
+        <symbol id="icon-left" viewBox="0 0 1024 1024">
+          <path
+            d="M879.6 648.5h-40.9 16.2c13.8-0.8 24.7-12.2 24.7-26.2v26.2zM483.7 327.5v-40.9 16.2c0.8 13.8 12.2 24.7 26.2 24.7h-26.2zM879.6 408.6v40.9-16.2c-0.8-13.8-12.2-24.7-26.2-24.7h26.2z"
+          />
+          <path
+            d="M141.3 530.1l260.9-260.9v80.1c3.2 29.6 25.3 53.6 54.1 59.4h423v239.1H443.1c-22.6 0-41 18.3-41 41s18.3 41 41 41h464.5c27.8-5.7 49.5-28.5 53.6-56.8V388.2c-3.5-34.3-32.5-61.1-67.7-61.1h-0.5v-0.1h-54.1v-0.1H484V170.4c0-0.7 0-1.3-0.1-2 0-0.3 0-0.6-0.1-1 0-0.3 0-0.7-0.1-1 0-0.4-0.1-0.8-0.1-1.2 0-0.3-0.1-0.5-0.1-0.8-0.1-0.4-0.1-0.9-0.2-1.3 0-0.2-0.1-0.4-0.1-0.7-0.1-0.4-0.2-0.9-0.3-1.3 0-0.2-0.1-0.4-0.1-0.6l-0.3-1.2c-0.1-0.2-0.1-0.5-0.2-0.7-0.1-0.4-0.2-0.8-0.4-1.1-0.1-0.3-0.2-0.5-0.3-0.8-0.1-0.3-0.3-0.7-0.4-1l-0.3-0.9c-0.1-0.3-0.3-0.6-0.4-0.9-0.1-0.3-0.3-0.7-0.4-1-0.1-0.2-0.2-0.5-0.4-0.7-0.2-0.4-0.4-0.7-0.5-1.1-0.1-0.2-0.2-0.4-0.4-0.6-0.2-0.4-0.4-0.7-0.6-1.1-0.1-0.2-0.2-0.4-0.4-0.6-0.2-0.4-0.5-0.7-0.7-1.1-0.1-0.2-0.3-0.4-0.4-0.6-0.2-0.4-0.5-0.7-0.8-1.1-0.2-0.2-0.3-0.4-0.5-0.6-0.2-0.3-0.5-0.6-0.7-0.9-0.2-0.3-0.5-0.5-0.7-0.8-0.2-0.2-0.4-0.5-0.6-0.7-0.5-0.5-0.9-1-1.4-1.5-0.5-0.5-1-0.9-1.5-1.4-0.2-0.2-0.5-0.4-0.7-0.6-0.3-0.2-0.5-0.5-0.8-0.7-0.3-0.3-0.6-0.5-0.9-0.7-0.2-0.2-0.4-0.3-0.6-0.5-0.4-0.3-0.7-0.5-1.1-0.8-0.2-0.1-0.4-0.3-0.6-0.4-0.4-0.2-0.7-0.5-1.1-0.7-0.2-0.1-0.4-0.2-0.6-0.4-0.4-0.2-0.7-0.4-1.1-0.6-0.2-0.1-0.4-0.2-0.6-0.4-0.4-0.2-0.7-0.4-1.1-0.5-0.2-0.1-0.5-0.2-0.7-0.4-0.3-0.2-0.7-0.3-1-0.4-0.3-0.1-0.6-0.3-0.9-0.4l-0.9-0.3c-0.3-0.1-0.7-0.3-1-0.4-0.3-0.1-0.5-0.2-0.8-0.3-0.4-0.1-0.8-0.3-1.1-0.4-0.2-0.1-0.5-0.1-0.7-0.2l-1.2-0.3c-0.2-0.1-0.4-0.1-0.7-0.2-0.4-0.1-0.9-0.2-1.3-0.3-0.2 0-0.4-0.1-0.7-0.1-0.4-0.1-0.9-0.2-1.3-0.2-0.3 0-0.5-0.1-0.8-0.1-0.4-0.1-0.8-0.1-1.2-0.1-0.3 0-0.7-0.1-1-0.1-0.3 0-0.6-0.1-0.9-0.1-1.3-0.1-2.7-0.1-4.1 0-0.3 0-0.6 0-0.9 0.1-0.3 0-0.7 0-1 0.1-0.4 0-0.8 0.1-1.2 0.1-0.3 0-0.5 0.1-0.8 0.1-0.4 0.1-0.9 0.1-1.3 0.2-0.2 0-0.4 0.1-0.7 0.1-0.4 0.1-0.9 0.2-1.3 0.3-0.2 0.1-0.4 0.1-0.7 0.2l-1.2 0.3c-0.2 0.1-0.5 0.1-0.7 0.2-0.4 0.1-0.8 0.2-1.1 0.4-0.3 0.1-0.5 0.2-0.8 0.3-0.3 0.1-0.7 0.3-1 0.4-0.3 0.1-0.6 0.2-0.9 0.4-0.3 0.1-0.6 0.3-0.9 0.4-0.3 0.1-0.7 0.3-1 0.4-0.2 0.1-0.5 0.2-0.7 0.4-0.4 0.2-0.7 0.4-1.1 0.6-0.2 0.1-0.4 0.2-0.6 0.4-0.4 0.2-0.8 0.4-1.1 0.6-0.2 0.1-0.4 0.2-0.6 0.4-0.4 0.2-0.8 0.5-1.1 0.7-0.2 0.1-0.4 0.3-0.6 0.4-0.4 0.2-0.7 0.5-1.1 0.8-0.2 0.2-0.4 0.3-0.6 0.5-0.3 0.2-0.6 0.5-1 0.7-0.3 0.2-0.5 0.4-0.8 0.7-0.2 0.2-0.5 0.4-0.7 0.6-0.5 0.4-1 0.9-1.4 1.4L55.3 500.3l-0.9 0.9c-8 8-12 18.5-12 29s4 21 12 29l0.9 0.9 358.8 358.8c16 16 41.9 16 57.9 0s16-41.9 0-57.9L141.3 530.1z"
+          />
+        </symbol>
+
         <symbol id="icon-music" viewBox="0 0 1024 1024">
           <title>music</title>
           <path
-            d="M768.496 359.12L648.224 572a128 128 0 1 1-1.648-92.288l90.784-160.656A295.2 295.2 0 0 0 520 224C356.512 224 224 356.512 224 520S356.512 816 520 816C683.472 816 816 683.472 816 520c0-59.328-17.44-114.56-47.504-160.88zM600.272 562.352l-0.272-0.144 1.648-2.912a80 80 0 1 0-1.376 3.072zM864 520C864 709.984 709.984 864 520 864S176 709.984 176 520 330.016 176 520 176 864 330.016 864 520z"
+            d="M427.52 961.92c-96 0-178.56-49.28-197.76-125.44-9.6-38.4-3.2-78.72 19.2-115.84 31.36-52.48 89.6-92.16 160-108.16 16.64-3.84 32.64-6.4 49.28-7.68L348.16 271.36c-7.68-23.04-5.12-48 6.4-69.12 11.52-21.76 32.64-38.4 56.96-44.8L748.8 67.2c18.56-5.12 38.4-0.64 52.48 12.16 14.08 12.16 20.48 30.72 17.92 49.28l-19.84 128c-4.48 28.8-25.6 52.48-54.4 60.16l-224.64 58.88c-17.28 4.48-34.56-5.76-39.04-23.04-4.48-17.28 5.76-34.56 23.04-39.04l224.64-58.88c3.84-1.28 7.04-3.84 7.68-7.68l17.92-115.2-327.04 87.68c-7.68 1.92-13.44 7.04-17.28 13.44-3.2 5.76-3.84 12.8-1.92 19.2L533.12 627.2c3.2 10.24 1.28 21.76-5.76 30.08-7.04 8.32-17.28 12.8-28.16 11.52-24.96-2.56-50.56-0.64-75.52 5.12-52.48 12.8-97.28 42.24-119.68 79.36-9.6 15.36-19.2 39.68-12.16 67.2 15.36 59.52 101.76 92.16 188.8 71.04 52.48-12.8 97.28-42.24 119.68-79.36 9.6-15.36 19.2-39.68 12.16-67.2-1.28-3.84-15.36-46.72-92.8-277.76-5.76-16.64 3.2-35.2 20.48-40.32 16.64-5.76 35.2 3.2 40.32 20.48 91.52 273.28 92.8 279.68 94.08 282.24 9.6 38.4 3.2 78.72-19.2 115.84-31.36 52.48-89.6 92.16-160 108.16-23.04 5.76-46.08 8.32-67.84 8.32z"
           />
         </symbol>
       </defs>
@@ -194,6 +249,7 @@
 <script>
 import Util from "../lib/util";
 import Resource from "../lib/resource";
+import Page from "../components/page";
 import RhythmService from "../services/rhythm_service";
 export default {
   props: {
@@ -205,10 +261,17 @@ export default {
       type: Boolean,
       default: false
     },
+    showList: {
+      type: Boolean,
+      default: false
+    },
     fixed: {
       type: Boolean,
       default: true
     }
+  },
+  components: {
+    page: Page
   },
   data() {
     return {
@@ -217,13 +280,19 @@ export default {
       duration: null,
       currentTime: null,
       isTimerPlaying: false,
-      tracks: [],
-      currentTrack: null,
-      currentTrackIndex: 0,
+      currentSong: null,
+      currentSongIndex: 0,
       transitionName: null,
       isShowCover: false,
 
       onceClicked: false,
+      volume: 0.5,
+      listMode: "songs",
+      currentSet: null,
+      sets: [],
+      setPageInfo: {},
+      songs: [],
+      songPageInfo: {},
 
       spectrumBars: [],
       spectrumBarNumber: 32,
@@ -264,11 +333,10 @@ export default {
       this.duration = durmin + ":" + dursec;
       this.currentTime = curmin + ":" + cursec;
     },
-    updateBar(x) {
+    updateBar(e) {
       let progress = this.$refs.progress;
       let maxduration = this.$refs.audio.duration;
-      let position = x - progress.offsetLeft;
-      let percentage = (100 * position) / progress.offsetWidth;
+      let percentage = (100 * e.offsetX) / progress.offsetWidth;
       if (percentage > 100) {
         percentage = 100;
       }
@@ -283,35 +351,35 @@ export default {
     clickProgress(e) {
       this.isTimerPlaying = true;
       this.$refs.audio.pause();
-      this.updateBar(e.pageX);
+      this.updateBar(e);
     },
     prevTrack() {
       this.transitionName = "scale-in";
       this.isShowCover = false;
-      if (this.currentTrackIndex > 0) {
-        this.currentTrackIndex--;
+      if (this.currentSongIndex > 0) {
+        this.currentSongIndex--;
       } else {
-        this.currentTrackIndex = this.tracks.length - 1;
+        this.currentSongIndex = this.songs.length - 1;
       }
-      this.currentTrack = this.tracks[this.currentTrackIndex];
+      this.currentSong = this.songs[this.currentSongIndex];
       this.resetPlayer();
     },
     nextTrack() {
       this.transitionName = "scale-out";
       this.isShowCover = false;
-      if (this.currentTrackIndex < this.tracks.length - 1) {
-        this.currentTrackIndex++;
+      if (this.currentSongIndex < this.songs.length - 1) {
+        this.currentSongIndex++;
       } else {
-        this.currentTrackIndex = 0;
+        this.currentSongIndex = 0;
       }
-      this.currentTrack = this.tracks[this.currentTrackIndex];
+      this.currentSong = this.songs[this.currentSongIndex];
       this.resetPlayer();
     },
     resetPlayer() {
       this.barWidth = 0;
       this.circleLeft = 0;
       this.$refs.audio.currentTime = 0;
-      this.$refs.audio.src = this.currentTrack.source;
+      this.$refs.audio.src = this.currentSong.url;
       setTimeout(() => {
         if (this.isTimerPlaying) {
           this.$refs.audio.play();
@@ -321,29 +389,106 @@ export default {
       }, 300);
     },
     favorite() {
-      this.tracks[this.currentTrackIndex].favorited = !this.tracks[
-        this.currentTrackIndex
+      this.songs[this.currentSongIndex].favorited = !this.songs[
+        this.currentSongIndex
       ].favorited;
     },
     onClickCtrl() {
       this.showPlayer = !this.showPlayer;
     },
-    async formateData() {
-      let set = await RhythmService.getRhythmSet(16);
-
-      if (set && set.rhythms.length > 0) {
-        set.rhythms.forEach(rhythm => {
-          if (rhythm.url != "") {
-            this.tracks.push({
-              name: rhythm.name,
-              artist: rhythm.singer_name,
-              cover: rhythm.avatar,
-              source: rhythm.url,
-              favorited: false
-            });
-          }
-        });
+    onClickList() {
+      this.showList = !this.showList;
+      if (this.showList) {
+        this.showPlayer = false;
       }
+    },
+    async onClickSet(index) {
+      this.listMode = "songs";
+      this.currentSet = this.sets[index];
+      await this.loadSongs();
+      this.currentSong = this.songs[0];
+      this.$refs.audio.src = this.currentSong.url;
+      this.play();
+    },
+
+    async onClickSong(index) {
+      this.currentSongIndex = index;
+      this.currentSong = this.songs[index];
+      this.$refs.audio.src = this.currentSong.url;
+      this.play();
+    },
+
+    onClickListMode() {
+      switch (this.listMode) {
+        case "sets":
+          this.listMode = "songs";
+          break;
+        case "songs":
+          this.listMode = "sets";
+          break;
+      }
+    },
+
+    async onChangeSetPage(action) {
+      switch (action) {
+        case "prev":
+          await this.loadSets(this.setPageInfo.prev);
+          break;
+        case "next":
+          await this.loadSets(this.setPageInfo.next);
+          break;
+      }
+    },
+
+    async onChangeSongPage(action) {
+      switch (action) {
+        case "prev":
+          await this.loadSongs(this.songPageInfo.prev);
+          break;
+        case "next":
+          await this.loadSongs(this.songPageInfo.next);
+          break;
+      }
+    },
+
+    async loadSets(page = 1) {
+      let data = await RhythmService.getRhythmSets(page);
+      this.sets = data.rhythm_sets;
+      this.currentSet = this.sets[0];
+      this.setPageInfo = data.page_info;
+    },
+
+    async loadSongs(page = 1) {
+      let data = await RhythmService.getRhythms(this.currentSet.id, page);
+      this.songs = data.rhythms.map(rhythm => {
+        rhythm.second2lyric = this.loadLyric(rhythm.lyric);
+
+        return rhythm;
+      });
+      this.songPageInfo = data.page_info;
+    },
+
+    loadLyric(str) {
+      var regex = /\[\d+:\d+.\d+\]/g;
+      let lyrics = str
+        .trim()
+        .split("\n")
+        .filter(lyric => {
+          let times = lyric.match(regex);
+          return times && lyric.replace(regex, "").trim().length > 0;
+        });
+      let second2lyric = new Map();
+      lyrics.forEach(lyric => {
+        let times = lyric
+          .match(regex)[0]
+          .slice(1, -1)
+          .split(":");
+        let second = parseFloat(times[0]) * 60 + parseFloat(times[1]);
+        let l = lyric.replace(regex, "").trim();
+        second2lyric.set(second, l);
+      });
+
+      return second2lyric;
     },
 
     loadSpectrum() {
@@ -392,10 +537,12 @@ export default {
 
   async created() {
     let vm = this;
-    await vm.formateData();
+    await vm.loadSets();
+    await vm.loadSongs();
 
-    this.currentTrack = this.tracks[0];
-    this.$refs.audio.src = this.currentTrack.source;
+    this.currentSong = this.songs[0];
+    this.$refs.audio.src = this.currentSong.url;
+    this.$refs.audio.volume = this.volume;
     this.$refs.audio.ontimeupdate = function() {
       vm.generateTime();
     };
@@ -408,8 +555,8 @@ export default {
     };
 
     // this is optional (for preload covers)
-    // for (let index = 0; index < this.tracks.length; index++) {
-    //   const element = this.tracks[index];
+    // for (let index = 0; index < this.songs.length; index++) {
+    //   const element = this.songs[index];
     //   let link = document.createElement("link");
     //   link.rel = "prefetch";
     //   link.href = element.cover;
@@ -440,6 +587,14 @@ export default {
   stroke-width: 0;
   stroke: currentColor;
   fill: currentColor;
+  transform: rotate(0deg);
+  transition: 0.3s;
+  &.v-i-left {
+    transform: rotate(0deg);
+  }
+  &.v-i-right {
+    transform: rotate(180deg);
+  }
 }
 
 .wrapper {
@@ -456,7 +611,7 @@ export default {
 }
 .v-i-fixed {
   position: fixed;
-  z-index: 9;
+  z-index: 999;
   left: 0;
   transition: 0.3s;
   height: 100%;
@@ -484,6 +639,154 @@ export default {
 @media screen and (max-width: 700px), (max-height: 500px) {
   .v-i-hide {
     top: calc(-532px);
+  }
+}
+
+.v-list {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: rgba($color: #f0f0f0, $alpha: 0.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+  &.v-i-active {
+    pointer-events: auto;
+    opacity: 1;
+  }
+  .v-set {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    padding: 200px 0;
+    .v-i-sets {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 0 50px;
+      .v-i-set {
+        cursor: pointer;
+        margin: 20px 50px;
+        &:hover {
+          .v-i-avatar {
+            transform: scale(1.1);
+          }
+          .v-i-name {
+            font-weight: bold;
+          }
+        }
+        .v-i-avatar {
+          display: block;
+          width: 180px;
+          height: 180px;
+          border-radius: 5px;
+          box-shadow: 0px 5px 10px 0px rgba(76, 70, 124, 0.2);
+          transform: scale(1);
+          transition: 0.3s;
+        }
+        .v-i-name {
+          color: #808080;
+          font-size: 12px;
+          margin: 10px 0 0 0;
+          font-weight: inherit;
+          transition: 0.3s;
+        }
+      }
+    }
+  }
+  .v-song {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    padding: 200px 0;
+    .v-i-songs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin: 0 50px;
+      .v-i-song {
+        cursor: pointer;
+        margin: 10px 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #808080;
+        background: inherit;
+        transition: 0.3s;
+        &.v-i-title {
+          font-weight: bold;
+          .v-i-avatar {
+            transform: scale(0);
+          }
+        }
+        &.v-i-active {
+          color: inherit;
+        }
+        &:hover {
+          color: inherit;
+        }
+        .v-i-avatar {
+          display: block;
+          width: 45px;
+          height: 45px;
+          border-radius: 3px;
+          box-shadow: 0px 5px 10px 0px rgba(76, 70, 124, 0.2);
+          transform: scale(1);
+          transition: 0.3s;
+        }
+        .v-i-name {
+          width: 180px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 12px;
+          margin: 0 20px;
+          font-weight: inherit;
+          transition: 0.3s;
+        }
+        .v-i-singer {
+          width: 180px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 12px;
+          font-weight: inherit;
+          transition: 0.3s;
+        }
+      }
+    }
+  }
+  .v-swap {
+    font-size: 20px;
+    width: 50px;
+    height: 50px;
+    background: #fff;
+    border-radius: 100%;
+    color: #4b3f90;
+    box-shadow: 0px 5px 10px 0px rgba(76, 70, 124, 0.2);
+    position: fixed;
+    bottom: 50px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: scale(1);
+    transition: 0.5s all;
+    &:hover {
+      transform: scale(1.2);
+    }
   }
 }
 
@@ -527,6 +830,10 @@ export default {
   z-index: 2;
   border-radius: 15px;
   z-index: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .v-i-bars {
     position: absolute;
     width: 100%;
@@ -542,6 +849,24 @@ export default {
       background: #532ab9;
       opacity: 0.7;
       filter: blur(3px);
+    }
+  }
+  .v-i-lyrics {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    font-size: 12px;
+    color: #ffffff;
+    background: rgba($color: #000, $alpha: 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .v-i-lyric {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
     }
   }
 }
@@ -699,6 +1024,13 @@ export default {
 .player-controls__item.-favorite.active {
   color: red;
 }
+.player-controls__item.-list.active {
+  color: red;
+}
+.player-controls__item.-list.active::before {
+  opacity: 1;
+  transform: scale(1.3);
+}
 
 [v-cloak] {
   display: none;
@@ -803,17 +1135,20 @@ export default {
   align-items: center;
   justify-content: center;
   position: relative;
-  font-size: 50px;
+  font-size: 30px;
   box-shadow: 0 5px 10px 0 rgba(76, 70, 124, 0.2);
   cursor: pointer;
   pointer-events: auto;
   color: #532ab9;
   transform: scale(1);
   transition: 0.3s;
+  animation: trans 10s linear infinite;
+  animation-fill-mode: forwards;
+  animation-play-state: paused;
   &.v-i-active {
+    animation-play-state: running;
     transform: scale(1.2);
     color: #532ab9;
-    animation: trans 5s linear infinite;
   }
   &:hover {
     transform: scale(1.2) rotate(360deg);

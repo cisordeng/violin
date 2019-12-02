@@ -76,6 +76,7 @@ export default {
 .v-top {
   opacity: 1;
   transition: 0.5s all;
+  z-index: 998;
   &.v-i-hide {
     opacity: 0;
     pointer-events: none;
@@ -94,7 +95,6 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999;
     cursor: pointer;
     transform: scale(1);
     transition: 0.5s all;
@@ -108,7 +108,6 @@ export default {
     position: fixed;
     top: 0;
     right: 0;
-    z-index: 999;
     cursor: pointer;
     .v-i-scrollBar {
       width: 6px;

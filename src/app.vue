@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <music-player></music-player>
     <top></top>
     <navs></navs>
     <images></images>
+    <music-player></music-player>
     <keep-alive>
       <transition :name="transitionName">
         <router-view v-if="$route.meta.keepAlive"></router-view>

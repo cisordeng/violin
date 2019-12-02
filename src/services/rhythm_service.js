@@ -6,13 +6,29 @@ class RhythmService extends Service {
 		super();
     }
 
-    async getRhythmSets() {
+    async getRhythms(rhythm_set_id, page=1, count_per_page=10) {
+        var data = await Resource.get({
+            service: 'nature',
+            resource: 'rhythm.rhythms',
+            data: {
+                rhythm_set_id: rhythm_set_id,
+                page: page,
+                count_per_page: count_per_page,
+            }
+        })
+        return data;
+    }
+
+    async getRhythmSets(page=1, count_per_page=10) {
         var data = await Resource.get({
             service: 'nature',
             resource: 'rhythm.rhythm_sets',
-            data: {}
+            data: {
+                page: page,
+                count_per_page: count_per_page,
+            }
         })
-        return data.rhythm_sets;
+        return data;
     }
 
     async getRhythmSet(id) {

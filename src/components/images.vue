@@ -46,7 +46,6 @@ export default {
   data() {
     return {
       show: false,
-      curImage: {},
       images: []
     };
   },

@@ -119,7 +119,7 @@ export default {
   position: fixed;
   bottom: 150px;
   right: 30px;
-  z-index: 999;
+  z-index: 998;
   .v-i-navs {
     display: flex;
     align-items: center;
