@@ -91,6 +91,12 @@ html, body {
   padding: 5px;
   box-sizing: border-box;
 }
+.content video {
+  max-width: 100%;
+  max-height: 320px;
+  padding: 5px;
+  box-sizing: border-box;
+}
 .content pre {
   overflow-x: auto;
 }
