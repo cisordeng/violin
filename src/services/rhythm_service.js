@@ -19,6 +19,17 @@ class RhythmService extends Service {
         return data;
     }
 
+    async getRhythm(id) {
+        var data = await Resource.get({
+            service: 'nature',
+            resource: 'rhythm.rhythm',
+            data: {
+                id: id,
+            }
+        })
+        return data;
+    }
+
     async getRhythmSets(page=1, count_per_page=10) {
         var data = await Resource.get({
             service: 'nature',
