@@ -1,8 +1,6 @@
 <template>
   <div class="v-main main">
     <div class="v-i-header v-i-home">
-      <img class="v-i-avatar" src="https://i.ibb.co/stYmBNJ/KBxNDJ.gif" />
-      <div class="v-i-slogan">我是谁，我在哪，我在干虾米</div>
       <div class="v-i-navs">
         <div v-for="nav in navs" :key="nav.name" class="v-i-nav">
           <a :href="nav.href" :target="nav.name">{{nav.name}}</a>
@@ -127,8 +125,10 @@ export default {
   .v-i-header {
     width: 100%;
     height: 300px;
-    background-image: linear-gradient(40deg, #9c4dff 0, #42a7ff 100%);
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NzAiIGhlaWdodD0iNDcwIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJyZ2IoNzUsNjMsMTQ0KSI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjE4IiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSI5IiBvcGFjaXR5PSIwLjA1NDY2NjY2NjY2NjY2NjY3IiBmaWxsPSIjZGRkIj48L3JlY3Q+PHJlY3QgeD0iMCIgeT0iMzkiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEyIiBvcGFjaXR5PSIwLjA4MDY2NjY2NjY2NjY2NjY2IiBmaWxsPSIjMjIyIj48L3JlY3Q+PHJlY3QgeD0iMCIgeT0iNzAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjkiIG9wYWNpdHk9IjAuMDU0NjY2NjY2NjY2NjY2NjciIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIwIiB5PSI4NyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iOSIgb3BhY2l0eT0iMC4wNTQ2NjY2NjY2NjY2NjY2NyIgZmlsbD0iI2RkZCI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjExNSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iNyIgb3BhY2l0eT0iMC4wMzczMzMzMzMzMzMzMzMzMyIgZmlsbD0iI2RkZCI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjE0MCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTEiIG9wYWNpdHk9IjAuMDcyMDAwMDAwMDAwMDAwMDEiIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIwIiB5PSIxNjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjE0IiBvcGFjaXR5PSIwLjA5OCIgZmlsbD0iIzIyMiI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjE4MyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMjAiIG9wYWNpdHk9IjAuMTUiIGZpbGw9IiMyMjIiPjwvcmVjdD48cmVjdCB4PSIwIiB5PSIyMDgiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjgiIG9wYWNpdHk9IjAuMDQ2IiBmaWxsPSIjMjIyIj48L3JlY3Q+PHJlY3QgeD0iMCIgeT0iMjM1IiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxNiIgb3BhY2l0eT0iMC4xMTUzMzMzMzMzMzMzMzMzNCIgZmlsbD0iIzIyMiI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjI2MyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTEiIG9wYWNpdHk9IjAuMDcyMDAwMDAwMDAwMDAwMDEiIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIwIiB5PSIyODgiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwIiBvcGFjaXR5PSIwLjA2MzMzMzMzMzMzMzMzMzM0IiBmaWxsPSIjMjIyIj48L3JlY3Q+PHJlY3QgeD0iMCIgeT0iMzA1IiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxNSIgb3BhY2l0eT0iMC4xMDY2NjY2NjY2NjY2NjY2NyIgZmlsbD0iI2RkZCI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjMzOSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTkiIG9wYWNpdHk9IjAuMTQxMzMzMzMzMzMzMzMzMzQiIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIwIiB5PSIzNzUiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjYiIG9wYWNpdHk9IjAuMDI4NjY2NjY2NjY2NjY2NjY3IiBmaWxsPSIjMjIyIj48L3JlY3Q+PHJlY3QgeD0iMCIgeT0iNDAwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSI1IiBvcGFjaXR5PSIwLjAyIiBmaWxsPSIjZGRkIj48L3JlY3Q+PHJlY3QgeD0iMCIgeT0iNDE5IiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxOSIgb3BhY2l0eT0iMC4xNDEzMzMzMzMzMzMzMzMzNCIgZmlsbD0iI2RkZCI+PC9yZWN0PjxyZWN0IHg9IjAiIHk9IjQ1MiIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTgiIG9wYWNpdHk9IjAuMTMyNjY2NjY2NjY2NjY2NjUiIGZpbGw9IiMyMjIiPjwvcmVjdD48cmVjdCB4PSIxOCIgeT0iMCIgd2lkdGg9IjkiIGhlaWdodD0iMTAwJSIgb3BhY2l0eT0iMC4wNTQ2NjY2NjY2NjY2NjY2NyIgZmlsbD0iI2RkZCI+PC9yZWN0PjxyZWN0IHg9IjM5IiB5PSIwIiB3aWR0aD0iMTIiIGhlaWdodD0iMTAwJSIgb3BhY2l0eT0iMC4wODA2NjY2NjY2NjY2NjY2NiIgZmlsbD0iIzIyMiI+PC9yZWN0PjxyZWN0IHg9IjcwIiB5PSIwIiB3aWR0aD0iOSIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjA1NDY2NjY2NjY2NjY2NjY3IiBmaWxsPSIjZGRkIj48L3JlY3Q+PHJlY3QgeD0iODciIHk9IjAiIHdpZHRoPSI5IiBoZWlnaHQ9IjEwMCUiIG9wYWNpdHk9IjAuMDU0NjY2NjY2NjY2NjY2NjciIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIxMTUiIHk9IjAiIHdpZHRoPSI3IiBoZWlnaHQ9IjEwMCUiIG9wYWNpdHk9IjAuMDM3MzMzMzMzMzMzMzMzMzMiIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIxNDAiIHk9IjAiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjA3MjAwMDAwMDAwMDAwMDAxIiBmaWxsPSIjZGRkIj48L3JlY3Q+PHJlY3QgeD0iMTYwIiB5PSIwIiB3aWR0aD0iMTQiIGhlaWdodD0iMTAwJSIgb3BhY2l0eT0iMC4wOTgiIGZpbGw9IiMyMjIiPjwvcmVjdD48cmVjdCB4PSIxODMiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjE1IiBmaWxsPSIjMjIyIj48L3JlY3Q+PHJlY3QgeD0iMjA4IiB5PSIwIiB3aWR0aD0iOCIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjA0NiIgZmlsbD0iIzIyMiI+PC9yZWN0PjxyZWN0IHg9IjIzNSIgeT0iMCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEwMCUiIG9wYWNpdHk9IjAuMTE1MzMzMzMzMzMzMzMzMzQiIGZpbGw9IiMyMjIiPjwvcmVjdD48cmVjdCB4PSIyNjMiIHk9IjAiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjA3MjAwMDAwMDAwMDAwMDAxIiBmaWxsPSIjZGRkIj48L3JlY3Q+PHJlY3QgeD0iMjg4IiB5PSIwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAwJSIgb3BhY2l0eT0iMC4wNjMzMzMzMzMzMzMzMzMzNCIgZmlsbD0iIzIyMiI+PC9yZWN0PjxyZWN0IHg9IjMwNSIgeT0iMCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjEwMCUiIG9wYWNpdHk9IjAuMTA2NjY2NjY2NjY2NjY2NjciIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSIzMzkiIHk9IjAiIHdpZHRoPSIxOSIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjE0MTMzMzMzMzMzMzMzMzM0IiBmaWxsPSIjZGRkIj48L3JlY3Q+PHJlY3QgeD0iMzc1IiB5PSIwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjAyODY2NjY2NjY2NjY2NjY2NyIgZmlsbD0iIzIyMiI+PC9yZWN0PjxyZWN0IHg9IjQwMCIgeT0iMCIgd2lkdGg9IjUiIGhlaWdodD0iMTAwJSIgb3BhY2l0eT0iMC4wMiIgZmlsbD0iI2RkZCI+PC9yZWN0PjxyZWN0IHg9IjQxOSIgeT0iMCIgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwMCUiIG9wYWNpdHk9IjAuMTQxMzMzMzMzMzMzMzMzMzQiIGZpbGw9IiNkZGQiPjwvcmVjdD48cmVjdCB4PSI0NTIiIHk9IjAiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMDAlIiBvcGFjaXR5PSIwLjEzMjY2NjY2NjY2NjY2NjY1IiBmaWxsPSIjMjIyIj48L3JlY3Q+PC9zdmc+);
+    background-image: url(https://images.alphacoders.com/505/505651.jpg);
+    // background-image: url(https://images8.alphacoders.com/389/389482.jpg);
+    background-position: center;
+    background-size: cover;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -136,17 +136,6 @@ export default {
     flex-shrink: 0;
     text-shadow: -5px 5px 0 rgba(0, 0, 0, 0.1);
     position: relative;
-    transition: 0.5s all;
-    .v-i-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-    }
-    .v-i-slogan {
-      margin: 10px 0;
-      color: #fdd;
-      font-size: 15px;
-    }
     .v-i-down {
       position: absolute;
       font-size: 58px;
@@ -171,6 +160,7 @@ export default {
     flex-direction: column;
     font-family: "Bitter", serif;
     text-align: center;
+    margin: 0 30vw 0 0;
     .v-i-nav {
       margin: 20px 0;
       transition: 0.3s;
@@ -178,12 +168,13 @@ export default {
       width: 100px;
       height: 20px;
       a {
+        color: #fee67a;
         text-decoration: none;
-        color: #d0d8e6;
-        font-weight: inherit;
+        font-weight: bold;
         position: relative;
+        text-shadow: 0 0 2px #fee67a;
         &:hover {
-          color: #fff;
+          text-shadow: 0 0 30px #fee67a;
         }
         &:before {
           content: ">";
@@ -235,6 +226,7 @@ export default {
       justify-content: center;
       padding: 0 10px;
       box-sizing: border-box;
+      margin: 0;
     }
   }
 
@@ -352,7 +344,7 @@ export default {
     }
     50% {
       transform: scale(1);
-      filter: drop-shadow(0px 0px 10px #fff);
+      filter: drop-shadow(0px 0px 10px #fee67a);
     }
     100% {
       transform: scale(1.2);

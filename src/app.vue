@@ -5,13 +5,9 @@
     <images></images>
     <music-player></music-player>
     <keep-alive>
-      <transition :name="transitionName">
         <router-view v-if="$route.meta.keepAlive"></router-view>
-      </transition>
     </keep-alive>
-    <transition :name="transitionName">
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
-    </transition>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
   </div>
 </template>
 
@@ -34,14 +30,6 @@ export default {
     };
   },
   watch: {
-    //使用watch 监听$router的变化
-    $route(to, from) {
-      if (to.meta.index < from.meta.index) {
-        this.transitionName = "slide-right";
-      } else {
-        this.transitionName = "slide-left";
-      }
-    }
   },
   methods: {},
   mounted() {}
