@@ -1,5 +1,6 @@
 <template>
   <div class="v-main main">
+    <link href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/zenburn.min.css" rel="stylesheet">
     <div class="v-i-header">
       <div class="v-i-title">{{article.title}}</div>
       <div class="v-i-time">{{article && article.created_at && article.created_at.split(' ')[0]}}</div>

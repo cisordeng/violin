@@ -2,7 +2,7 @@
   <div class="v-main main">
     <div class="v-i-header">
       <div class="v-i-title">动态</div>
-      <div class="v-i-subtitle">垃圾桶垃圾桶垃圾桶</div>
+      <div class="v-i-subtitle">记录生活 留住感动</div>
       <router-link class="v-i-edit" to="/edit_word">
         <svg class="icon">
           <use xlink:href="#icon-edit" />
