@@ -125,8 +125,7 @@ export default {
   .v-i-header {
     width: 100%;
     height: 300px;
-    background-image: url(https://images.alphacoders.com/505/505651.jpg);
-    // background-image: url(https://images8.alphacoders.com/389/389482.jpg);
+    background-image: url(https://i.ibb.co/pyvmdWP/KOublR.jpg);
     background-position: center;
     background-size: cover;
     display: flex;
@@ -160,7 +159,6 @@ export default {
     flex-direction: column;
     font-family: "Bitter", serif;
     text-align: center;
-    margin: 0 30vw 0 0;
     .v-i-nav {
       margin: 20px 0;
       transition: 0.3s;
@@ -168,13 +166,14 @@ export default {
       width: 100px;
       height: 20px;
       a {
-        color: #fee67a;
+        color: #695f48;
         text-decoration: none;
         font-weight: bold;
         position: relative;
-        text-shadow: 0 0 2px #fee67a;
+        text-shadow: 0 0 2px #695f48;
+        transition: 0.2s;
         &:hover {
-          text-shadow: 0 0 30px #fee67a;
+          text-shadow: 0 0 5px #695f48;
         }
         &:before {
           content: ">";

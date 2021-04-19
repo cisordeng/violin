@@ -379,7 +379,7 @@ export default {
       this.barWidth = 0;
       this.circleLeft = 0;
       this.$refs.audio.currentTime = 0;
-      this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
+      // this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
       this.$refs.audio.src = this.currentSong.url;
       setTimeout(() => {
         if (this.isTimerPlaying) {
@@ -408,7 +408,7 @@ export default {
       this.currentSet = this.sets[index];
       await this.loadSongs();
       this.currentSong = this.songs[0];
-      this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
+      // this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
       this.$refs.audio.src = this.currentSong.url;
       this.play();
     },
@@ -416,7 +416,7 @@ export default {
     async onClickSong(index) {
       this.currentSongIndex = index;
       this.currentSong = this.songs[index];
-      this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
+      // this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
       this.$refs.audio.src = this.currentSong.url;
       this.play();
     },
@@ -547,7 +547,7 @@ export default {
     await vm.loadSongs();
 
     this.currentSong = this.songs[0];
-    this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
+    // this.currentSong = await RhythmService.getRhythm(this.currentSong.id);
     this.$refs.audio.src = this.currentSong.url;
     this.$refs.audio.volume = this.volume;
     this.$refs.audio.ontimeupdate = function() {
